@@ -1,72 +1,25 @@
-import { faker, Faker } from '@faker-js/faker';
 import * as t from 'io-ts';
+import { DefineOptions, Realm } from './realm';
 
-export type Manifester<T> = (faker: Faker) => T;
-
-export type Persister<T> = (entity: T) => Promise<T>;
-
-const registeredManifesters = new Map<string, Manifester<any>>();
-
-const registeredPersisters = new Map<string, Persister<any>>();
-
-export interface DefineOptions<P extends t.Props> {
-  manifest: Manifester<t.OutputOf<t.TypeC<P>>>;
-  persist?: Persister<t.OutputOf<t.TypeC<P>>>;
-}
+const globalRealm = new Realm();
 
 export const define = <P extends t.Props>(
   entity: t.TypeC<P> | t.ExactC<t.TypeC<P>>,
-  { manifest: manifester, persist: persister }: DefineOptions<P>
+  options: DefineOptions<P>
 ): void => {
-  registeredManifesters.set(entity.name, manifester);
-
-  if (typeof persister === 'function') {
-    registeredPersisters.set(entity.name, persister);
-  }
+  globalRealm.define(entity, options);
 };
 
 export const clearRegisteredFactories = () => {
-  registeredManifesters.clear();
+  globalRealm.clear();
 };
 
 export const manifest = <P extends t.Props>(
   entity: t.TypeC<P> | t.ExactC<t.TypeC<P>>,
   overrides: t.TypeOfPartialProps<P> = {}
-): t.OutputOf<t.TypeC<P>> => {
-  const findManifester = () => {
-    const registeredManifester = registeredManifesters.get(entity.name);
-    if (typeof registeredManifester === 'function') {
-      return registeredManifester;
-    }
-
-    throw new Error(`No manifester found for '${entity.name}'.`);
-  };
-
-  const manifester = findManifester();
-
-  const manifestedEntity = manifester(faker);
-
-  for (const key in overrides) {
-    manifestedEntity[key] = overrides[key];
-  }
-
-  return manifestedEntity;
-};
+): t.OutputOf<t.TypeC<P>> => globalRealm.manifest(entity, overrides);
 
 export const persist = <P extends t.Props>(
   entity: t.TypeC<P> | t.ExactC<t.TypeC<P>>,
   overrides: t.TypeOfPartialProps<P> = {}
-): Promise<t.OutputOf<t.TypeC<P>>> => {
-  const findPersister = () => {
-    const registeredPersister = registeredPersisters.get(entity.name);
-    if (typeof registeredPersister === 'function') {
-      return registeredPersister;
-    }
-
-    throw new Error(`No persister found for '${entity.name}'.`);
-  };
-
-  const persister = findPersister();
-
-  return persister(manifest(entity, overrides));
-};
+): Promise<t.OutputOf<t.TypeC<P>>> => globalRealm.persist(entity, overrides);
