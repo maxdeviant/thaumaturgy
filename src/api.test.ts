@@ -49,7 +49,7 @@ describe('define', () => {
   });
 
   describe('when `manifest` is invoked', () => {
-    it('calls the manifestation function', () => {
+    it('calls the manifester', () => {
       const manifester = jest.fn();
 
       define(Movie, { manifest: manifester });
@@ -59,7 +59,7 @@ describe('define', () => {
       expect(manifester).toHaveBeenCalledTimes(1);
     });
 
-    it('passes a Faker instance to the manifestation function', () => {
+    it('passes a Faker instance to the manifester', () => {
       const manifester = jest.fn();
 
       define(Movie, { manifest: manifester });
