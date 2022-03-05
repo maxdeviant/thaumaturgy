@@ -11,6 +11,9 @@
     "build": "tsc -p .",
     "test": "jest"
   },
+  "files": [
+    "lib/"
+  ],
   "peerDependencies": {
     "fp-ts": "2.x",
     "io-ts": "2.x"
