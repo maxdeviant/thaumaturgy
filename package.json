@@ -12,7 +12,9 @@
     "test": "jest"
   },
   "files": [
-    "lib/"
+    "lib/",
+    "!lib/**/__tests__/",
+    "!lib/**/*.test.{js,d.ts}"
   ],
   "peerDependencies": {
     "fp-ts": "2.x",
