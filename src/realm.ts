@@ -38,7 +38,7 @@ export class Realm {
 
   private manifestWithRefs<P extends t.Props>(
     Entity: t.TypeC<P> | t.ExactC<t.TypeC<P>>,
-    overrides: t.TypeOfPartialProps<P> = {}
+    overrides: t.TypeOfPartialProps<P>
   ) {
     const manifester = this.storage.findManifester(Entity.name);
 
