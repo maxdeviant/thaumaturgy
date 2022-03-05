@@ -8,12 +8,13 @@ describe('API', () => {
     lastName: t.string,
   });
 
-  define(User, faker =>
-    User.encode({
-      firstName: faker.name.firstName(),
-      lastName: faker.name.lastName(),
-    })
-  );
+  define(User, {
+    manifest: faker =>
+      User.encode({
+        firstName: faker.name.firstName(),
+        lastName: faker.name.lastName(),
+      }),
+  });
 
   it('works', () => {
     console.log(User);
@@ -51,7 +52,7 @@ describe('define', () => {
     it('calls the manifestation function', () => {
       const manifester = jest.fn();
 
-      define(Movie, manifester);
+      define(Movie, { manifest: manifester });
 
       manifest(Movie);
 
@@ -61,7 +62,7 @@ describe('define', () => {
     it('passes a Faker instance to the manifestation function', () => {
       const manifester = jest.fn();
 
-      define(Movie, manifester);
+      define(Movie, { manifest: manifester });
 
       manifest(Movie);
 
@@ -80,12 +81,13 @@ describe('manifest', () => {
     beforeAll(() => {
       clearRegisteredFactories();
 
-      define(Car, () =>
-        Car.encode({
-          make: 'Honda',
-          model: 'Civic',
-        })
-      );
+      define(Car, {
+        manifest: () =>
+          Car.encode({
+            make: 'Honda',
+            model: 'Civic',
+          }),
+      });
     });
 
     describe('with no overrides', () => {
@@ -126,12 +128,13 @@ describe('manifest', () => {
     beforeAll(() => {
       clearRegisteredFactories();
 
-      define(Car, () =>
-        Car.encode({
-          make: 'Honda',
-          model: 'Civic',
-        })
-      );
+      define(Car, {
+        manifest: () =>
+          Car.encode({
+            make: 'Honda',
+            model: 'Civic',
+          }),
+      });
     });
 
     describe('with no overrides', () => {

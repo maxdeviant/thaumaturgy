@@ -1,37 +1,41 @@
 import { faker, Faker } from '@faker-js/faker';
 import * as t from 'io-ts';
 
-export type FactoryFn<TEntity> = (faker: Faker) => TEntity;
+export type Manifester<T> = (faker: Faker) => T;
 
-const registeredFactories = new Map<string, FactoryFn<any>>();
+const registeredManifesters = new Map<string, Manifester<any>>();
+
+export interface DefineOptions<P extends t.Props> {
+  manifest: Manifester<t.OutputOf<t.TypeC<P>>>;
+}
 
 export const define = <P extends t.Props>(
   entity: t.TypeC<P> | t.ExactC<t.TypeC<P>>,
-  factory: FactoryFn<t.OutputOf<t.TypeC<P>>>
+  { manifest: manifester }: DefineOptions<P>
 ): void => {
-  registeredFactories.set(entity.name, factory);
+  registeredManifesters.set(entity.name, manifester);
 };
 
 export const clearRegisteredFactories = () => {
-  registeredFactories.clear();
+  registeredManifesters.clear();
 };
 
 export const manifest = <P extends t.Props>(
   entity: t.TypeC<P> | t.ExactC<t.TypeC<P>>,
   overrides: t.TypeOfPartialProps<P> = {}
 ): t.OutputOf<t.TypeC<P>> => {
-  const findFactory = () => {
-    const registeredFactory = registeredFactories.get(entity.name);
-    if (typeof registeredFactory === 'function') {
-      return registeredFactory;
+  const findManifester = () => {
+    const registeredManifester = registeredManifesters.get(entity.name);
+    if (typeof registeredManifester === 'function') {
+      return registeredManifester;
     }
 
-    throw new Error(`No factory found for '${entity.name}'.`);
+    throw new Error(`No manifester found for '${entity.name}'.`);
   };
 
-  const factory = findFactory();
+  const manifester = findManifester();
 
-  const manifestedEntity = factory(faker);
+  const manifestedEntity = manifester(faker);
 
   for (const key in overrides) {
     manifestedEntity[key] = overrides[key];
