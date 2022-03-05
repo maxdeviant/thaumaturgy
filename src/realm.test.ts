@@ -218,7 +218,7 @@ describe('Realm', () => {
       });
 
       describe('when providing a parent entity via overrides', () => {
-        it('does not ', () => {
+        it('only manifests the required entities', () => {
           const manifestSpy = jest.spyOn(realm, 'manifest');
 
           realm.manifest(Class, {
