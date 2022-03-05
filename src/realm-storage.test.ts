@@ -1,8 +1,5 @@
-import {
-  ManifesterNotFoundError,
-  PersisterNotFoundError,
-  RealmStorage,
-} from './realm-storage';
+import { ManifesterNotFoundError, PersisterNotFoundError } from './errors';
+import { RealmStorage } from './realm-storage';
 
 describe('RealmStorage', () => {
   describe('registerManifester', () => {
