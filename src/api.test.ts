@@ -1,7 +1,7 @@
 import * as t from 'io-ts';
 import { define, manifest } from './factory';
 
-const User = t.strict({
+const User = t.type({
   firstName: t.string,
   lastName: t.string,
 });
@@ -27,5 +27,11 @@ describe('API', () => {
     const otherUser = manifest(User);
 
     console.log(otherUser);
+
+    const anotherUser = manifest(User, {
+      firstName: 'First Name Override',
+    });
+
+    console.log(anotherUser);
   });
 });

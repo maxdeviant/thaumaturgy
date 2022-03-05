@@ -6,13 +6,16 @@ export type FactoryFn<TEntity> = (faker: Faker) => TEntity;
 const registeredFactories = new Map<string, FactoryFn<any>>();
 
 export const define = <TEntity>(
-  entity: t.ExactC<any>,
+  entity: t.Mixed,
   factory: FactoryFn<TEntity>
 ): void => {
   registeredFactories.set(entity.name, factory);
 };
 
-export const manifest = <TEntity extends t.ExactC<any>>(entity: TEntity) => {
+export const manifest = <P extends t.Props>(
+  entity: t.TypeC<P>,
+  overrides: t.TypeOfPartialProps<P> = {} as any
+): t.OutputOf<t.TypeC<P>> => {
   const findFactory = () => {
     const registeredFactory = registeredFactories.get(entity.name);
     if (typeof registeredFactory === 'function') {
@@ -24,5 +27,11 @@ export const manifest = <TEntity extends t.ExactC<any>>(entity: TEntity) => {
 
   const factory = findFactory();
 
-  return factory(faker);
+  const manifestedEntity = factory(faker);
+
+  for (const key in overrides) {
+    manifestedEntity[key] = overrides[key];
+  }
+
+  return manifestedEntity;
 };
