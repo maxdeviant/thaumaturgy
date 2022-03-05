@@ -1,6 +1,7 @@
 import { faker } from '@faker-js/faker';
 import * as t from 'io-ts';
 import { Realm } from './realm';
+import { Ref } from './ref';
 
 describe('Realm', () => {
   describe('define', () => {
@@ -191,7 +192,7 @@ describe('Realm', () => {
         realm.define(Phylum, {
           manifest: () =>
             Phylum.encode({
-              kingdom: realm.ref(Kingdom).through(kingdom => kingdom.name),
+              kingdom: Ref.to(Kingdom).through(kingdom => kingdom.name),
               name: 'Chordata',
             }),
         });
@@ -199,7 +200,7 @@ describe('Realm', () => {
         realm.define(Class, {
           manifest: () =>
             Class.encode({
-              phylum: realm.ref(Phylum).through(phylum => phylum.name),
+              phylum: Ref.to(Phylum).through(phylum => phylum.name),
               name: 'Mammalia',
             }),
         });

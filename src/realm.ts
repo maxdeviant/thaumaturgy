@@ -1,7 +1,7 @@
 import faker from '@faker-js/faker';
 import * as t from 'io-ts';
 import { RealmStorage } from './realm-storage';
-import { MappedRef, Ref } from './ref';
+import { MappedRef } from './ref';
 import { Manifester, Persister } from './types';
 
 export interface DefineOptions<P extends t.Props> {
@@ -41,7 +41,7 @@ export class Realm {
           continue;
         }
 
-        manifestedEntity[key] = value.manifest();
+        manifestedEntity[key] = value.manifest(this);
       }
     }
 
@@ -59,9 +59,5 @@ export class Realm {
     const persister = this.storage.findPersister(Entity.name);
 
     return persister(this.manifest(Entity, overrides));
-  }
-
-  ref<P extends t.Props>(Entity: t.TypeC<P> | t.ExactC<t.TypeC<P>>) {
-    return new Ref(this, Entity);
   }
 }
