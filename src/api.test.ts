@@ -43,7 +43,7 @@ describe('define', () => {
     year: t.Int,
   });
 
-  afterEach(() => {
+  beforeEach(() => {
     clearRegisteredFactories();
   });
 
