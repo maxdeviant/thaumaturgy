@@ -5,9 +5,9 @@ export type FactoryFn<TEntity> = (faker: Faker) => TEntity;
 
 const registeredFactories = new Map<string, FactoryFn<any>>();
 
-export const define = <TEntity>(
-  entity: t.Mixed,
-  factory: FactoryFn<TEntity>
+export const define = <P extends t.Props>(
+  entity: t.TypeC<P> | t.ExactC<t.TypeC<P>>,
+  factory: FactoryFn<t.OutputOf<t.TypeC<P>>>
 ): void => {
   registeredFactories.set(entity.name, factory);
 };
