@@ -169,5 +169,54 @@ describe('Realm', () => {
         });
       });
     });
+
+    describe('for an entity hierarchy', () => {
+      const realm = new Realm();
+
+      const Kingdom = t.type({ name: t.string });
+
+      const Phylum = t.type({ kingdom: t.string, name: t.string });
+
+      const Class = t.type({ phylum: t.string, name: t.string });
+
+      beforeAll(() => {
+        realm.define(Kingdom, {
+          manifest: () => Kingdom.encode({ name: 'Animalia' }),
+        });
+
+        realm.define(Phylum, {
+          manifest: () => {
+            const kingdom = realm.manifest(Kingdom);
+
+            return Phylum.encode({
+              kingdom: kingdom.name,
+              name: 'Chordata',
+            });
+          },
+        });
+
+        realm.define(Class, {
+          manifest: () => {
+            const phylum = realm.manifest(Phylum);
+
+            return Class.encode({
+              phylum: phylum.name,
+              name: 'Mammalia',
+            });
+          },
+        });
+      });
+
+      it('manifests an instance of each entity in the hierarchy', () => {
+        const manifestSpy = jest.spyOn(realm, 'manifest');
+
+        realm.manifest(Class);
+
+        expect(manifestSpy).toHaveBeenCalledTimes(3);
+        expect(manifestSpy).toHaveBeenNthCalledWith(1, Class);
+        expect(manifestSpy).toHaveBeenNthCalledWith(2, Phylum);
+        expect(manifestSpy).toHaveBeenNthCalledWith(3, Kingdom);
+      });
+    });
   });
 });
