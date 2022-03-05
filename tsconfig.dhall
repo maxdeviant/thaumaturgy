@@ -11,6 +11,7 @@ let updateCompilerOptions
     = λ(compilerOptions : tsconfig.CompilerOptions.Type) →
           compilerOptions
         ⫽ { declaration = Some True
+          , stripInternal = Some True
           , esModuleInterop = Some True
           , module = Some tsconfig.ModuleOption.CommonJS
           , moduleResolution = Some tsconfig.ModuleResolutionOption.node

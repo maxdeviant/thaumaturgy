@@ -13,6 +13,7 @@
     "noUnusedParameters": true,
     "outDir": "lib",
     "strict": true,
+    "stripInternal": true,
     "target": "ES5"
   },
   "include": ["src"]
