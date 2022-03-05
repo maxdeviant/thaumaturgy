@@ -1,0 +1,14 @@
+{
+  "name": "thaumaturge",
+  "version": "1.0.0",
+  "main": "index.js",
+  "repository": "git@github.com:maxdeviant/thaumaturge.git",
+  "author": "Marshall Bowers <elliott.codes@gmail.com>",
+  "license": "MIT",
+  "scripts": {
+    "build": "tsc -p ."
+  },
+  "devDependencies": {
+    "typescript": "4.6.2"
+  }
+}
