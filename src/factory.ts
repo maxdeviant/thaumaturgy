@@ -3,17 +3,26 @@ import * as t from 'io-ts';
 
 export type Manifester<T> = (faker: Faker) => T;
 
+export type Persister<T> = (entity: T) => Promise<T>;
+
 const registeredManifesters = new Map<string, Manifester<any>>();
+
+const registeredPersisters = new Map<string, Persister<any>>();
 
 export interface DefineOptions<P extends t.Props> {
   manifest: Manifester<t.OutputOf<t.TypeC<P>>>;
+  persist?: Persister<t.OutputOf<t.TypeC<P>>>;
 }
 
 export const define = <P extends t.Props>(
   entity: t.TypeC<P> | t.ExactC<t.TypeC<P>>,
-  { manifest: manifester }: DefineOptions<P>
+  { manifest: manifester, persist: persister }: DefineOptions<P>
 ): void => {
   registeredManifesters.set(entity.name, manifester);
+
+  if (typeof persister === 'function') {
+    registeredPersisters.set(entity.name, persister);
+  }
 };
 
 export const clearRegisteredFactories = () => {
@@ -42,4 +51,22 @@ export const manifest = <P extends t.Props>(
   }
 
   return manifestedEntity;
+};
+
+export const persist = <P extends t.Props>(
+  entity: t.TypeC<P> | t.ExactC<t.TypeC<P>>,
+  overrides: t.TypeOfPartialProps<P> = {}
+): Promise<t.OutputOf<t.TypeC<P>>> => {
+  const findPersister = () => {
+    const registeredPersister = registeredPersisters.get(entity.name);
+    if (typeof registeredPersister === 'function') {
+      return registeredPersister;
+    }
+
+    throw new Error(`No persister found for '${entity.name}'.`);
+  };
+
+  const persister = findPersister();
+
+  return persister(manifest(entity, overrides));
 };

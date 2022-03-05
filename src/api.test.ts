@@ -1,6 +1,6 @@
 import faker from '@faker-js/faker';
 import * as t from 'io-ts';
-import { clearRegisteredFactories, define, manifest } from './factory';
+import { clearRegisteredFactories, define, manifest, persist } from './factory';
 
 describe('API', () => {
   const User = t.type({
@@ -67,6 +67,39 @@ describe('define', () => {
       manifest(Movie);
 
       expect(manifester).toHaveBeenCalledWith(faker);
+    });
+  });
+
+  describe('when `persist` is invoked', () => {
+    it('calls the persister', async () => {
+      const persister = jest.fn(movie => Promise.resolve(movie));
+
+      define(Movie, {
+        manifest: () => Movie.encode({ title: 'Arrival', year: 2017 as t.Int }),
+        persist: persister,
+      });
+
+      await persist(Movie);
+
+      expect(persister).toHaveBeenCalledTimes(1);
+    });
+
+    it('passes the manifested entity to the persister', async () => {
+      const persister = jest.fn(movie => Promise.resolve(movie));
+
+      define(Movie, {
+        manifest: () => Movie.encode({ title: 'Arrival', year: 2017 as t.Int }),
+        persist: persister,
+      });
+
+      await persist(Movie);
+
+      expect(persister).toHaveBeenCalledWith(
+        Movie.encode({
+          title: 'Arrival',
+          year: 2017 as t.Int,
+        })
+      );
     });
   });
 });
