@@ -12,9 +12,13 @@ export const define = <TEntity>(
   registeredFactories.set(entity.name, factory);
 };
 
+export const clearRegisteredFactories = () => {
+  registeredFactories.clear();
+};
+
 export const manifest = <P extends t.Props>(
-  entity: t.TypeC<P>,
-  overrides: t.TypeOfPartialProps<P> = {} as any
+  entity: t.TypeC<P> | t.ExactC<t.TypeC<P>>,
+  overrides: t.TypeOfPartialProps<P> = {}
 ): t.OutputOf<t.TypeC<P>> => {
   const findFactory = () => {
     const registeredFactory = registeredFactories.get(entity.name);
