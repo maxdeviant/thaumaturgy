@@ -43,5 +43,52 @@ realm.define(Movie, {
 
 const movie = realm.manifest(Movie);
 
-console.log(movie); // { title: 'efficient turn-key', year: 2021 }
+console.log(movie);
+// > { title: 'efficient turn-key', year: 2021 }
+```
+
+### Entity Hierarchies
+
+```ts
+import * as t from 'io-ts';
+import { Realm, Ref } from 'thaumaturge';
+
+const Author = t.type({
+  id: t.string,
+  name: t.string,
+});
+
+const Book = t.type({
+  id: t.string,
+  authorId: t.string,
+  title: t.string,
+});
+
+const realm = new Realm();
+
+realm.define(Author, {
+  manifest: faker =>
+    Author.encode({
+      id: faker.datatype.uuid(),
+      name: faker.name.findName(),
+    }),
+});
+
+realm.define(Book, {
+  manifest: faker =>
+    Book.encode({
+      id: faker.datatype.uuid(),
+      authorId: Ref.to(Author).through(author => author.id),
+      title: faker.random.words(),
+    }),
+});
+
+const book = realm.manifest(Book);
+
+console.log(book);
+// > {
+//     id: '1ab4790a-9911-4e20-9006-b12e6b60dfe6',
+//     authorId: 'c6a1f6e0-6845-4675-b570-87024446a371',
+//     title: 'Tuna Central'
+//   }
 ```
