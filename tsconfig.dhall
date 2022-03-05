@@ -15,7 +15,7 @@ let updateCompilerOptions
           , esModuleInterop = Some True
           , module = Some tsconfig.ModuleOption.CommonJS
           , moduleResolution = Some tsconfig.ModuleResolutionOption.node
-          , target = Some tsconfig.TargetOption.ES5
+          , target = Some tsconfig.TargetOption.ES6
           , outDir = Some "lib"
           }
 

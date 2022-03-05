@@ -14,7 +14,7 @@
     "outDir": "lib",
     "strict": true,
     "stripInternal": true,
-    "target": "ES5"
+    "target": "ES6"
   },
   "include": ["src"]
 }
