@@ -20,7 +20,7 @@ export class Ref<P extends t.Props> {
  */
 export class MappedRef<P extends t.Props, U> {
   constructor(
-    private readonly Entity: t.TypeC<P> | t.ExactC<t.TypeC<P>>,
+    readonly Entity: t.TypeC<P> | t.ExactC<t.TypeC<P>>,
     private readonly mapping: (entity: t.OutputOf<t.TypeC<P>>) => U
   ) {}
 

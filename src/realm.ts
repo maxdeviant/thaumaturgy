@@ -31,7 +31,18 @@ export class Realm {
     Entity: t.TypeC<P> | t.ExactC<t.TypeC<P>>,
     overrides: t.TypeOfPartialProps<P> = {}
   ): t.OutputOf<t.TypeC<P>> {
+    const { manifestedEntity } = this.manifestWithRefs(Entity, overrides);
+
+    return manifestedEntity;
+  }
+
+  private manifestWithRefs<P extends t.Props>(
+    Entity: t.TypeC<P> | t.ExactC<t.TypeC<P>>,
+    overrides: t.TypeOfPartialProps<P> = {}
+  ) {
     const manifester = this.storage.findManifester(Entity.name);
+
+    const refs: MappedRef<any, any>[] = [];
 
     const manifestedEntity = manifester(faker);
 
@@ -41,6 +52,8 @@ export class Realm {
           continue;
         }
 
+        refs.push(value);
+
         manifestedEntity[key] = value.manifest(this);
       }
     }
@@ -49,15 +62,21 @@ export class Realm {
       manifestedEntity[key] = overrides[key];
     }
 
-    return manifestedEntity;
+    return { manifestedEntity, refs };
   }
 
-  persist<P extends t.Props>(
+  async persist<P extends t.Props>(
     Entity: t.TypeC<P> | t.ExactC<t.TypeC<P>>,
     overrides: t.TypeOfPartialProps<P> = {}
   ): Promise<t.OutputOf<t.TypeC<P>>> {
     const persister = this.storage.findPersister(Entity.name);
 
-    return persister(this.manifest(Entity, overrides));
+    const { manifestedEntity, refs } = this.manifestWithRefs(Entity, overrides);
+
+    for (const ref of refs) {
+      await this.persist(ref.Entity);
+    }
+
+    return persister(manifestedEntity);
   }
 }
