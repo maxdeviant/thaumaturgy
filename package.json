@@ -6,9 +6,11 @@
   "author": "Marshall Bowers <elliott.codes@gmail.com>",
   "license": "MIT",
   "scripts": {
+    "format": "prettier --ignore-path .gitignore --write '**/*.+(js|json|md|ts|tsx)'",
     "build": "tsc -p ."
   },
   "devDependencies": {
+    "prettier": "2.5.1",
     "typescript": "4.6.2"
   }
 }
