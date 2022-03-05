@@ -13,13 +13,13 @@ export class Realm {
   private readonly storage = new RealmStorage();
 
   define<P extends t.Props>(
-    entity: t.TypeC<P> | t.ExactC<t.TypeC<P>>,
+    Entity: t.TypeC<P> | t.ExactC<t.TypeC<P>>,
     { manifest: manifester, persist: persister }: DefineOptions<P>
   ): void {
-    this.storage.registerManifester(entity.name, manifester);
+    this.storage.registerManifester(Entity.name, manifester);
 
     if (typeof persister === 'function') {
-      this.storage.registerPersister(entity.name, persister);
+      this.storage.registerPersister(Entity.name, persister);
     }
   }
 
@@ -28,10 +28,10 @@ export class Realm {
   }
 
   manifest<P extends t.Props>(
-    entity: t.TypeC<P> | t.ExactC<t.TypeC<P>>,
+    Entity: t.TypeC<P> | t.ExactC<t.TypeC<P>>,
     overrides: t.TypeOfPartialProps<P> = {}
   ): t.OutputOf<t.TypeC<P>> {
-    const manifester = this.storage.findManifester(entity.name);
+    const manifester = this.storage.findManifester(Entity.name);
 
     const manifestedEntity = manifester(faker);
 
@@ -53,15 +53,15 @@ export class Realm {
   }
 
   persist<P extends t.Props>(
-    entity: t.TypeC<P> | t.ExactC<t.TypeC<P>>,
+    Entity: t.TypeC<P> | t.ExactC<t.TypeC<P>>,
     overrides: t.TypeOfPartialProps<P> = {}
   ): Promise<t.OutputOf<t.TypeC<P>>> {
-    const persister = this.storage.findPersister(entity.name);
+    const persister = this.storage.findPersister(Entity.name);
 
-    return persister(this.manifest(entity, overrides));
+    return persister(this.manifest(Entity, overrides));
   }
 
-  ref<P extends t.Props>(entity: t.TypeC<P> | t.ExactC<t.TypeC<P>>) {
-    return new Ref(this, entity);
+  ref<P extends t.Props>(Entity: t.TypeC<P> | t.ExactC<t.TypeC<P>>) {
+    return new Ref(this, Entity);
   }
 }

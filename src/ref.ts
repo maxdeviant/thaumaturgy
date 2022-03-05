@@ -7,11 +7,11 @@ import { Realm } from './realm';
 export class Ref<P extends t.Props> {
   constructor(
     private readonly realm: Realm,
-    private readonly entity: t.TypeC<P> | t.ExactC<t.TypeC<P>>
+    private readonly Entity: t.TypeC<P> | t.ExactC<t.TypeC<P>>
   ) {}
 
   through<U>(mapping: (entity: t.OutputOf<t.TypeC<P>>) => U) {
-    return new MappedRef(this.realm, this.entity, mapping) as unknown as U;
+    return new MappedRef(this.realm, this.Entity, mapping) as unknown as U;
   }
 }
 
@@ -21,11 +21,11 @@ export class Ref<P extends t.Props> {
 export class MappedRef<P extends t.Props, U> {
   constructor(
     private readonly realm: Realm,
-    private readonly entity: t.TypeC<P> | t.ExactC<t.TypeC<P>>,
+    private readonly Entity: t.TypeC<P> | t.ExactC<t.TypeC<P>>,
     private readonly mapping: (entity: t.OutputOf<t.TypeC<P>>) => U
   ) {}
 
   manifest() {
-    return this.mapping(this.realm.manifest(this.entity));
+    return this.mapping(this.realm.manifest(this.Entity));
   }
 }
