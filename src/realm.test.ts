@@ -13,7 +13,9 @@ describe('Realm', () => {
       it('calls the manifester', () => {
         const realm = new Realm();
 
-        const manifester = jest.fn();
+        const manifester = jest.fn(() =>
+          Movie.encode({ title: 'Pulp Fiction', year: 1994 as t.Int })
+        );
 
         realm.define(Movie, { manifest: manifester });
 
@@ -25,7 +27,9 @@ describe('Realm', () => {
       it('passes a Faker instance to the manifester', () => {
         const realm = new Realm();
 
-        const manifester = jest.fn();
+        const manifester = jest.fn(() =>
+          Movie.encode({ title: 'Pulp Fiction', year: 1994 as t.Int })
+        );
 
         realm.define(Movie, { manifest: manifester });
 
@@ -179,31 +183,25 @@ describe('Realm', () => {
 
       const Class = t.type({ phylum: t.string, name: t.string });
 
-      beforeAll(() => {
+      beforeEach(() => {
         realm.define(Kingdom, {
           manifest: () => Kingdom.encode({ name: 'Animalia' }),
         });
 
         realm.define(Phylum, {
-          manifest: () => {
-            const kingdom = realm.manifest(Kingdom);
-
-            return Phylum.encode({
-              kingdom: kingdom.name,
+          manifest: () =>
+            Phylum.encode({
+              kingdom: realm.ref(Kingdom).through(kingdom => kingdom.name),
               name: 'Chordata',
-            });
-          },
+            }),
         });
 
         realm.define(Class, {
-          manifest: () => {
-            const phylum = realm.manifest(Phylum);
-
-            return Class.encode({
-              phylum: phylum.name,
+          manifest: () =>
+            Class.encode({
+              phylum: realm.ref(Phylum).through(phylum => phylum.name),
               name: 'Mammalia',
-            });
-          },
+            }),
         });
       });
 
@@ -216,6 +214,21 @@ describe('Realm', () => {
         expect(manifestSpy).toHaveBeenNthCalledWith(1, Class);
         expect(manifestSpy).toHaveBeenNthCalledWith(2, Phylum);
         expect(manifestSpy).toHaveBeenNthCalledWith(3, Kingdom);
+      });
+
+      describe('when providing a parent entity via overrides', () => {
+        it('does not ', () => {
+          const manifestSpy = jest.spyOn(realm, 'manifest');
+
+          realm.manifest(Class, {
+            phylum: 'Arthropoda',
+          });
+
+          expect(manifestSpy).toHaveBeenCalledTimes(1);
+          expect(manifestSpy).toHaveBeenNthCalledWith(1, Class, {
+            phylum: 'Arthropoda',
+          });
+        });
       });
     });
   });
