@@ -1,14 +1,19 @@
 {
   "name": "thaumaturge",
   "version": "0.1.0",
-  "main": "index.js",
   "repository": "git@github.com:maxdeviant/thaumaturge.git",
   "author": "Marshall Bowers <elliott.codes@gmail.com>",
   "license": "MIT",
+  "main": "lib/index.js",
+  "types": "lib/index.d.ts",
   "scripts": {
     "format": "prettier --ignore-path .gitignore --write '**/*.+(js|json|md|ts|tsx)'",
     "build": "tsc -p .",
     "test": "jest"
+  },
+  "peerDependencies": {
+    "fp-ts": "2.x",
+    "io-ts": "2.x"
   },
   "dependencies": {
     "@faker-js/faker": "6.0.0-alpha.7"
