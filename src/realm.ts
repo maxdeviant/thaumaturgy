@@ -1,40 +1,29 @@
-import faker from '@faker-js/faker';
+import { faker } from '@faker-js/faker';
 import * as t from 'io-ts';
 import { RealmStorage } from './realm-storage';
 import { MappedRef } from './ref';
-import { Manifester, Persister } from './types';
-
-export interface DefineOptions<P extends t.Props> {
-  manifest: Manifester<t.OutputOf<t.TypeC<P>>>;
-  persist?: Persister<t.OutputOf<t.TypeC<P>>>;
-}
+import { Define, Manifest, Persist } from './types';
 
 export class Realm {
   private readonly storage = new RealmStorage();
 
-  define<P extends t.Props>(
-    Entity: t.TypeC<P> | t.ExactC<t.TypeC<P>>,
-    { manifest: manifester, persist: persister }: DefineOptions<P>
-  ): void {
+  define: Define = (Entity, { manifest: manifester, persist: persister }) => {
     this.storage.registerManifester(Entity.name, manifester);
 
     if (typeof persister === 'function') {
       this.storage.registerPersister(Entity.name, persister);
     }
-  }
+  };
 
   clear() {
     this.storage.clear();
   }
 
-  manifest<P extends t.Props>(
-    Entity: t.TypeC<P> | t.ExactC<t.TypeC<P>>,
-    overrides: t.TypeOfPartialProps<P> = {}
-  ): t.OutputOf<t.TypeC<P>> {
+  manifest: Manifest = (Entity, overrides = {}) => {
     const { manifestedEntity } = this.manifestWithRefs(Entity, overrides);
 
     return manifestedEntity;
-  }
+  };
 
   private manifestWithRefs<P extends t.Props>(
     Entity: t.TypeC<P> | t.ExactC<t.TypeC<P>>,
@@ -65,10 +54,7 @@ export class Realm {
     return { manifestedEntity, refs };
   }
 
-  async persist<P extends t.Props>(
-    Entity: t.TypeC<P> | t.ExactC<t.TypeC<P>>,
-    overrides: t.TypeOfPartialProps<P> = {}
-  ): Promise<t.OutputOf<t.TypeC<P>>> {
+  persist: Persist = async (Entity, overrides = {}) => {
     const persister = this.storage.findPersister(Entity.name);
 
     const { manifestedEntity, refs } = this.manifestWithRefs(Entity, overrides);
@@ -78,5 +64,5 @@ export class Realm {
     }
 
     return persister(manifestedEntity);
-  }
+  };
 }

@@ -24,16 +24,14 @@ npm install thaumaturge io-ts fp-ts
 
 ```ts
 import * as t from 'io-ts';
-import { Realm } from 'thaumaturge';
+import { define, manifest } from 'thaumaturge';
 
 const Movie = t.strict({
   title: t.string,
   year: t.number,
 });
 
-const realm = new Realm();
-
-realm.define(Movie, {
+define(Movie, {
   manifest: faker =>
     Movie.encode({
       title: faker.random.words(),
@@ -41,7 +39,7 @@ realm.define(Movie, {
     }),
 });
 
-const movie = realm.manifest(Movie);
+const movie = manifest(Movie);
 
 console.log(movie);
 // > { title: 'efficient turn-key', year: 2021 }
@@ -51,7 +49,7 @@ console.log(movie);
 
 ```ts
 import * as t from 'io-ts';
-import { Realm, Ref } from 'thaumaturge';
+import { define, manifest, Ref } from 'thaumaturge';
 
 const Author = t.type({
   id: t.string,
@@ -64,9 +62,7 @@ const Book = t.type({
   title: t.string,
 });
 
-const realm = new Realm();
-
-realm.define(Author, {
+define(Author, {
   manifest: faker =>
     Author.encode({
       id: faker.datatype.uuid(),
@@ -74,7 +70,7 @@ realm.define(Author, {
     }),
 });
 
-realm.define(Book, {
+define(Book, {
   manifest: faker =>
     Book.encode({
       id: faker.datatype.uuid(),
@@ -83,7 +79,7 @@ realm.define(Book, {
     }),
 });
 
-const book = realm.manifest(Book);
+const book = manifest(Book);
 
 console.log(book);
 // > {
