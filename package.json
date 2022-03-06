@@ -4,6 +4,18 @@
   "repository": "git@github.com:maxdeviant/thaumaturge.git",
   "author": "Marshall Bowers <elliott.codes@gmail.com>",
   "license": "MIT",
+  "description": "Thaumaturge is a fixtures and seeding library powered by `io-ts`.",
+  "keywords": [
+    "thaumaturge",
+    "typescript",
+    "io-ts",
+    "test",
+    "testing",
+    "fixture",
+    "factory",
+    "seed",
+    "seeding"
+  ],
   "main": "lib/index.js",
   "types": "lib/index.d.ts",
   "scripts": {
