@@ -3,35 +3,35 @@ import { RealmStorage } from './realm-storage';
 
 describe('RealmStorage', () => {
   describe('registerManifester', () => {
-    it('registers the persister in the realm storage', () => {
+    it('registers the manifester in the realm storage', () => {
       const storage = new RealmStorage();
 
-      const persister = jest.fn();
+      const manifester = jest.fn();
 
-      storage.registerManifester('User', persister);
+      storage.registerManifester('User', manifester);
 
       const registeredManifester = storage.findManifester('User');
 
-      expect(registeredManifester).toBe(persister);
+      expect(registeredManifester).toBe(manifester);
     });
   });
 
   describe('findManifester', () => {
-    describe('when a persister is registered under the given name', () => {
-      it('returns the persister', () => {
+    describe('when a manifester is registered under the given name', () => {
+      it('returns the manifester', () => {
         const storage = new RealmStorage();
 
-        const persister = jest.fn();
+        const manifester = jest.fn();
 
-        storage.registerManifester('User', persister);
+        storage.registerManifester('User', manifester);
 
         const registeredManifester = storage.findManifester('User');
 
-        expect(registeredManifester).toBe(persister);
+        expect(registeredManifester).toBe(manifester);
       });
     });
 
-    describe('when a persister is not registered under the given name', () => {
+    describe('when a manifester is not registered under the given name', () => {
       it('throws a `ManifesterNotFoundError`', () => {
         const storage = new RealmStorage();
 
