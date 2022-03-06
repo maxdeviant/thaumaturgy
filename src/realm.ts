@@ -28,6 +28,18 @@ export class Realm {
     return manifestedEntity;
   };
 
+  readonly persist: Persist = async (Entity, overrides = {}) => {
+    const persister = this.storage.findPersister(Entity.name);
+
+    const { manifestedEntity, refs } = this.manifestWithRefs(Entity, overrides);
+
+    for (const ref of refs) {
+      await this.persist(ref.Entity);
+    }
+
+    return persister(manifestedEntity);
+  };
+
   private manifestWithRefs<P extends t.Props>(
     Entity: t.TypeC<P> | t.ExactC<t.TypeC<P>>,
     overrides: t.TypeOfPartialProps<P>
@@ -56,16 +68,4 @@ export class Realm {
 
     return { manifestedEntity, refs };
   }
-
-  readonly persist: Persist = async (Entity, overrides = {}) => {
-    const persister = this.storage.findPersister(Entity.name);
-
-    const { manifestedEntity, refs } = this.manifestWithRefs(Entity, overrides);
-
-    for (const ref of refs) {
-      await this.persist(ref.Entity);
-    }
-
-    return persister(manifestedEntity);
-  };
 }
