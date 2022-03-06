@@ -33,7 +33,7 @@ export class Realm {
 
     const refs: MappedRef<any, any>[] = [];
 
-    const manifestedEntity = manifester(faker);
+    const manifestedEntity = manifester({ faker });
 
     for (const [key, value] of Object.entries(manifestedEntity)) {
       if (value instanceof MappedRef) {

@@ -3,7 +3,11 @@ import * as t from 'io-ts';
 
 export type EntityName = string;
 
-export type Manifester<T> = (faker: Faker) => T;
+export interface ManifesterOptions {
+  faker: Faker;
+}
+
+export type Manifester<T> = (options: ManifesterOptions) => T;
 
 export type Persister<T> = (entity: T) => Promise<T>;
 

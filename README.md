@@ -34,7 +34,7 @@ const Movie = t.strict({
 });
 
 define(Movie, {
-  manifest: faker =>
+  manifest: ({ faker }) =>
     Movie.encode({
       title: faker.random.words(),
       year: faker.date.past(10).getFullYear(),
@@ -65,7 +65,7 @@ const Book = t.type({
 });
 
 define(Author, {
-  manifest: faker =>
+  manifest: ({ faker }) =>
     Author.encode({
       id: faker.datatype.uuid(),
       name: faker.name.findName(),
@@ -73,7 +73,7 @@ define(Author, {
 });
 
 define(Book, {
-  manifest: faker =>
+  manifest: ({ faker }) =>
     Book.encode({
       id: faker.datatype.uuid(),
       authorId: Ref.to(Author).through(author => author.id),

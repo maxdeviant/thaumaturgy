@@ -11,7 +11,7 @@ describe('Public API', () => {
     });
 
     define(Movie, {
-      manifest: faker =>
+      manifest: ({ faker }) =>
         Movie.encode({
           title: faker.random.words(),
           year: faker.date.past(10).getFullYear(),
@@ -39,7 +39,7 @@ describe('Public API', () => {
     });
 
     define(Author, {
-      manifest: faker =>
+      manifest: ({ faker }) =>
         Author.encode({
           id: faker.datatype.uuid(),
           name: faker.name.findName(),
@@ -47,7 +47,7 @@ describe('Public API', () => {
     });
 
     define(Book, {
-      manifest: faker =>
+      manifest: ({ faker }) =>
         Book.encode({
           id: faker.datatype.uuid(),
           authorId: Ref.to(Author).through(author => author.id),

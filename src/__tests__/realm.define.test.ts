@@ -35,7 +35,9 @@ describe('Realm', () => {
 
         realm.manifest(Movie);
 
-        expect(manifester).toHaveBeenCalledWith(faker);
+        expect(manifester).toHaveBeenCalledWith(
+          expect.objectContaining({ faker })
+        );
       });
     });
 
