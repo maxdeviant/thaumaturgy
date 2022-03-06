@@ -6,18 +6,20 @@ Thaumaturge is a fixtures and seeding library powered by `io-ts`.
 
 ## Installation
 
-Thaumaturge has peer dependencies on `io-ts` and `fp-ts`.
+Thaumaturge has peer dependencies on `io-ts` and `fp-ts`, so be sure to have those installed first.
+
+The `thaumaturge` package should then be installed as a development dependency:
 
 #### Yarn
 
 ```sh
-yarn add thaumaturge io-ts fp-ts
+yarn add -D thaumaturge
 ```
 
 #### npm
 
 ```sh
-npm install thaumaturge io-ts fp-ts
+npm install -D thaumaturge
 ```
 
 ## Usage
