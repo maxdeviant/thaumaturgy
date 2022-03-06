@@ -7,7 +7,10 @@ import { Define, Manifest, Persist } from './types';
 export class Realm {
   private readonly storage = new RealmStorage();
 
-  define: Define = (Entity, { manifest: manifester, persist: persister }) => {
+  readonly define: Define = (
+    Entity,
+    { manifest: manifester, persist: persister }
+  ) => {
     this.storage.registerManifester(Entity.name, manifester);
 
     if (typeof persister === 'function') {
@@ -19,7 +22,7 @@ export class Realm {
     this.storage.clear();
   }
 
-  manifest: Manifest = (Entity, overrides = {}) => {
+  readonly manifest: Manifest = (Entity, overrides = {}) => {
     const { manifestedEntity } = this.manifestWithRefs(Entity, overrides);
 
     return manifestedEntity;
@@ -54,7 +57,7 @@ export class Realm {
     return { manifestedEntity, refs };
   }
 
-  persist: Persist = async (Entity, overrides = {}) => {
+  readonly persist: Persist = async (Entity, overrides = {}) => {
     const persister = this.storage.findPersister(Entity.name);
 
     const { manifestedEntity, refs } = this.manifestWithRefs(Entity, overrides);
