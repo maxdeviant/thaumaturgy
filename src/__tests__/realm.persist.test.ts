@@ -16,8 +16,6 @@ describe('Realm', () => {
     };
 
     describe('for a `type` codec', () => {
-      const realm = new Realm();
-
       const Car = t.type({
         make: t.string,
         model: t.string,
@@ -27,6 +25,8 @@ describe('Realm', () => {
         const { db } = await setupDatabase();
 
         await db.exec('create table car (make text, model text)');
+
+        const realm = new Realm();
 
         realm.define(Car, {
           manifest: () =>
@@ -41,12 +41,12 @@ describe('Realm', () => {
           },
         });
 
-        return { db };
+        return { db, realm };
       };
 
       describe('with no overrides', () => {
         it('persists an instance of the provided type', async () => {
-          const { db } = await performSetup();
+          const { db, realm } = await performSetup();
 
           const persisted = await realm.persist(Car);
 
@@ -65,7 +65,7 @@ describe('Realm', () => {
 
       describe('with overrides', () => {
         it('persists an instance of the provided type with the overrides applied', async () => {
-          const { db } = await performSetup();
+          const { db, realm } = await performSetup();
 
           const persisted = await realm.persist(Car, {
             model: 'CRV',
@@ -86,8 +86,6 @@ describe('Realm', () => {
     });
 
     describe('for an entity hierarchy', () => {
-      const realm = new Realm();
-
       const Kingdom = t.type({ name: t.string });
 
       const Phylum = t.type({ kingdom: t.string, name: t.string });
@@ -105,6 +103,8 @@ describe('Realm', () => {
         await db.exec(
           'create table class (phylum text, name text primary key, foreign key(phylum) references phylum(name))'
         );
+
+        const realm = new Realm();
 
         realm.define(Kingdom, {
           manifest: () => Kingdom.encode({ name: 'Animalia' }),
@@ -149,11 +149,11 @@ describe('Realm', () => {
           },
         });
 
-        return { db };
+        return { db, realm };
       };
 
       it('persists an instance of each entity in the hierarchy', async () => {
-        const { db } = await performSetup();
+        const { db, realm } = await performSetup();
 
         const persisted = await realm.persist(Class);
 

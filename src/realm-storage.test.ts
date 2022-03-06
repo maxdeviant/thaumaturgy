@@ -1,4 +1,9 @@
-import { ManifesterNotFoundError, PersisterNotFoundError } from './errors';
+import {
+  ManifesterAlreadyRegisteredError,
+  ManifesterNotFoundError,
+  PersisterAlreadyRegisteredError,
+  PersisterNotFoundError,
+} from './errors';
 import { RealmStorage } from './realm-storage';
 
 describe('RealmStorage', () => {
@@ -13,6 +18,18 @@ describe('RealmStorage', () => {
       const registeredManifester = storage.findManifester('User');
 
       expect(registeredManifester).toBe(manifester);
+    });
+
+    describe('when a manifester is already registred under the given name', () => {
+      it('throws a `ManifesterAlreadyRegisteredError`', () => {
+        const storage = new RealmStorage();
+
+        storage.registerManifester('Animal', jest.fn());
+
+        expect(() => storage.registerManifester('Animal', jest.fn())).toThrow(
+          new ManifesterAlreadyRegisteredError('Animal')
+        );
+      });
     });
   });
 
@@ -53,6 +70,18 @@ describe('RealmStorage', () => {
       const registeredPersister = storage.findPersister('User');
 
       expect(registeredPersister).toBe(persister);
+    });
+
+    describe('when a persister is already registred under the given name', () => {
+      it('throws a `PersisterAlreadyRegisteredError`', () => {
+        const storage = new RealmStorage();
+
+        storage.registerPersister('Animal', jest.fn());
+
+        expect(() => storage.registerPersister('Animal', jest.fn())).toThrow(
+          new PersisterAlreadyRegisteredError('Animal')
+        );
+      });
     });
   });
 

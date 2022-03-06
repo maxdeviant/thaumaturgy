@@ -1,4 +1,9 @@
-import { ManifesterNotFoundError, PersisterNotFoundError } from './errors';
+import {
+  ManifesterAlreadyRegisteredError,
+  ManifesterNotFoundError,
+  PersisterAlreadyRegisteredError,
+  PersisterNotFoundError,
+} from './errors';
 import { EntityName, Manifester, Persister } from './types';
 
 /**
@@ -9,6 +14,10 @@ export class RealmStorage {
   private readonly persisters = new Map<EntityName, Persister<any>>();
 
   registerManifester(entityName: EntityName, manifester: Manifester<any>) {
+    if (this.manifesters.has(entityName)) {
+      throw new ManifesterAlreadyRegisteredError(entityName);
+    }
+
     this.manifesters.set(entityName, manifester);
   }
 
@@ -22,6 +31,10 @@ export class RealmStorage {
   }
 
   registerPersister(entityName: EntityName, persister: Persister<any>) {
+    if (this.persisters.has(entityName)) {
+      throw new PersisterAlreadyRegisteredError(entityName);
+    }
+
     this.persisters.set(entityName, persister);
   }
 

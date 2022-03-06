@@ -107,7 +107,7 @@ describe('Realm', () => {
 
       const Class = t.type({ phylum: t.string, name: t.string });
 
-      beforeEach(() => {
+      beforeAll(() => {
         realm.define(Kingdom, {
           manifest: () => Kingdom.encode({ name: 'Animalia' }),
         });
