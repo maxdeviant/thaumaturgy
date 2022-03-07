@@ -2,14 +2,14 @@ import * as t from 'io-ts';
 import { Realm } from './realm';
 import { EntityC } from './types';
 
-export class Ref<P extends t.Props, P2 extends t.Props> {
-  static to<P extends t.Props, P2 extends t.Props>(Entity: EntityC<P, P2>) {
+export class Ref<C extends EntityC> {
+  static to<C extends EntityC>(Entity: C) {
     return new Ref(Entity);
   }
 
-  private constructor(private readonly Entity: EntityC<P, P2>) {}
+  private constructor(private readonly Entity: C) {}
 
-  through<U>(mapping: (entity: t.OutputOf<t.TypeC<P>>) => U) {
+  through<U>(mapping: (entity: t.OutputOf<C>) => U) {
     return new MappedRef(this.Entity, mapping) as unknown as U;
   }
 }
@@ -17,10 +17,10 @@ export class Ref<P extends t.Props, P2 extends t.Props> {
 /**
  * @internal
  */
-export class MappedRef<P extends t.Props, P2 extends t.Props, U> {
+export class MappedRef<C extends EntityC, U> {
   constructor(
-    readonly Entity: EntityC<P, P2>,
-    private readonly mapping: (entity: t.OutputOf<t.TypeC<P>>) => U
+    readonly Entity: C,
+    private readonly mapping: (entity: t.OutputOf<C>) => U
   ) {}
 
   manifest(realm: Realm) {

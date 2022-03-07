@@ -40,13 +40,13 @@ export class Realm {
     return persister(manifestedEntity);
   };
 
-  private manifestWithRefs<P extends t.Props, P2 extends t.Props>(
-    Entity: EntityC<P, P2>,
-    overrides: t.TypeOfPartialProps<P>
+  private manifestWithRefs<C extends EntityC>(
+    Entity: C,
+    overrides: Partial<t.OutputOf<C>>
   ) {
     const manifester = this.storage.findManifester(Entity.name);
 
-    const refs: MappedRef<any, any, any>[] = [];
+    const refs: MappedRef<any, any>[] = [];
 
     const manifestedEntity = manifester({ faker });
 

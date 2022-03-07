@@ -73,10 +73,10 @@ describe('io-ts Codecs', () => {
               ReadonlyIntersection.encode({ a: 'hello', b: 'world' }),
           });
 
-          expect(realm.manifest(ReadonlyIntersection)).toEqual({
-            a: 'hello',
-            b: 'world',
-          });
+          const manifested = realm.manifest(ReadonlyIntersection);
+
+          expect(manifested.a).toBe('hello');
+          expect(manifested.b).toBe('world');
         });
       });
 
@@ -96,10 +96,10 @@ describe('io-ts Codecs', () => {
               ReadonlyStrictIntersection.encode({ a: 'hello', b: 'world' }),
           });
 
-          expect(realm.manifest(ReadonlyStrictIntersection)).toEqual({
-            a: 'hello',
-            b: 'world',
-          });
+          const manifested = realm.manifest(ReadonlyStrictIntersection);
+
+          expect(manifested.a).toBe('hello');
+          expect(manifested.b).toBe('world');
         });
       });
     });
