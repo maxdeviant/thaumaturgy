@@ -15,73 +15,71 @@ describe('Realm', () => {
       return { db };
     };
 
-    describe('for a `type` codec', () => {
-      const Car = t.type({
-        make: t.string,
-        model: t.string,
+    const Car = t.type({
+      make: t.string,
+      model: t.string,
+    });
+
+    const performSetup = async () => {
+      const { db } = await setupDatabase();
+
+      await db.exec('create table car (make text, model text)');
+
+      const realm = new Realm();
+
+      realm.define(Car, {
+        manifest: () =>
+          Car.encode({
+            make: 'Honda',
+            model: 'Civic',
+          }),
+        persist: async car => {
+          await db.run('insert into car values (?, ?)', car.make, car.model);
+
+          return car;
+        },
       });
 
-      const performSetup = async () => {
-        const { db } = await setupDatabase();
+      return { db, realm };
+    };
 
-        await db.exec('create table car (make text, model text)');
+    describe('with no overrides', () => {
+      it('persists an instance of the provided type', async () => {
+        const { db, realm } = await performSetup();
 
-        const realm = new Realm();
+        const persisted = await realm.persist(Car);
 
-        realm.define(Car, {
-          manifest: () =>
-            Car.encode({
-              make: 'Honda',
-              model: 'Civic',
-            }),
-          persist: async car => {
-            await db.run('insert into car values (?, ?)', car.make, car.model);
+        expect(persisted).toEqual(
+          Car.encode({
+            make: 'Honda',
+            model: 'Civic',
+          })
+        );
 
-            return car;
-          },
-        });
+        const carFromDatabase = await db.get('select make, model from car');
 
-        return { db, realm };
-      };
-
-      describe('with no overrides', () => {
-        it('persists an instance of the provided type', async () => {
-          const { db, realm } = await performSetup();
-
-          const persisted = await realm.persist(Car);
-
-          expect(persisted).toEqual(
-            Car.encode({
-              make: 'Honda',
-              model: 'Civic',
-            })
-          );
-
-          const carFromDatabase = await db.get('select make, model from car');
-
-          expect(carFromDatabase).toEqual(persisted);
-        });
+        expect(carFromDatabase).toEqual(persisted);
       });
+    });
 
-      describe('with overrides', () => {
-        it('persists an instance of the provided type with the overrides applied', async () => {
-          const { db, realm } = await performSetup();
+    describe('with overrides', () => {
+      it('persists an instance of the provided type with the overrides applied', async () => {
+        const { db, realm } = await performSetup();
 
-          const persisted = await realm.persist(Car, {
+        const persisted = await realm.persist(Car, {
+          model: 'CRV',
+        });
+
+        expect(persisted).toEqual(
+          Car.encode({
+            make: 'Honda',
             model: 'CRV',
-          });
+          })
+        );
 
-          expect(persisted).toEqual(
-            Car.encode({
-              make: 'Honda',
-              model: 'CRV',
-            })
-          );
+        const carFromDatabase = await db.get('select make, model from car');
 
-          const carFromDatabase = await db.get('select make, model from car');
-
-          expect(carFromDatabase).toEqual(persisted);
-        });
+        expect(carFromDatabase).toEqual(persisted);
       });
     });
 

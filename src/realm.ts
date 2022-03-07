@@ -2,7 +2,7 @@ import { faker } from '@faker-js/faker';
 import * as t from 'io-ts';
 import { RealmStorage } from './realm-storage';
 import { MappedRef } from './ref';
-import { Define, Manifest, Persist } from './types';
+import { Define, EntityC, Manifest, Persist } from './types';
 
 export class Realm {
   private readonly storage = new RealmStorage();
@@ -40,13 +40,13 @@ export class Realm {
     return persister(manifestedEntity);
   };
 
-  private manifestWithRefs<P extends t.Props>(
-    Entity: t.TypeC<P> | t.ExactC<t.TypeC<P>>,
+  private manifestWithRefs<P extends t.Props, P2 extends t.Props>(
+    Entity: EntityC<P, P2>,
     overrides: t.TypeOfPartialProps<P>
   ) {
     const manifester = this.storage.findManifester(Entity.name);
 
-    const refs: MappedRef<any, any>[] = [];
+    const refs: MappedRef<any, any, any>[] = [];
 
     const manifestedEntity = manifester({ faker });
 

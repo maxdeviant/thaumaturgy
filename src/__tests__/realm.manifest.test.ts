@@ -4,97 +4,48 @@ import { Ref } from '../ref';
 
 describe('Realm', () => {
   describe('manifest', () => {
-    describe('for a `type` codec', () => {
-      const realm = new Realm();
+    const realm = new Realm();
 
-      const Car = t.type({
-        make: t.string,
-        model: t.string,
-      });
+    const Car = t.type({
+      make: t.string,
+      model: t.string,
+    });
 
-      beforeAll(() => {
-        realm.define(Car, {
-          manifest: () =>
-            Car.encode({
-              make: 'Honda',
-              model: 'Civic',
-            }),
-        });
-      });
-
-      describe('with no overrides', () => {
-        it('manifests an instance of the provided type', () => {
-          const manifested = realm.manifest(Car);
-
-          expect(manifested).toEqual(
-            Car.encode({
-              make: 'Honda',
-              model: 'Civic',
-            })
-          );
-        });
-      });
-
-      describe('with overrides', () => {
-        it('manifests an instance of the provided type with the overrides applied', () => {
-          const manifested = realm.manifest(Car, {
-            model: 'CRV',
-          });
-
-          expect(manifested).toEqual(
-            Car.encode({
-              make: 'Honda',
-              model: 'CRV',
-            })
-          );
-        });
+    beforeAll(() => {
+      realm.define(Car, {
+        manifest: () =>
+          Car.encode({
+            make: 'Honda',
+            model: 'Civic',
+          }),
       });
     });
 
-    describe('for a `strict` codec', () => {
-      const realm = new Realm();
+    describe('with no overrides', () => {
+      it('manifests an instance of the provided type', () => {
+        const manifested = realm.manifest(Car);
 
-      const Car = t.strict({
-        make: t.string,
-        model: t.string,
+        expect(manifested).toEqual(
+          Car.encode({
+            make: 'Honda',
+            model: 'Civic',
+          })
+        );
       });
+    });
 
-      beforeAll(() => {
-        realm.define(Car, {
-          manifest: () =>
-            Car.encode({
-              make: 'Honda',
-              model: 'Civic',
-            }),
+    describe('with overrides', () => {
+      it('manifests an instance of the provided type with the overrides applied', () => {
+        const manifested = realm.manifest(Car, {
+          model: 'CRV',
         });
-      });
 
-      describe('with no overrides', () => {
-        it('manifests an instance of the provided type', () => {
-          const manifested = realm.manifest(Car);
-
-          expect(manifested).toEqual(
-            Car.encode({
-              make: 'Honda',
-              model: 'Civic',
-            })
-          );
-        });
-      });
-
-      describe('with overrides', () => {
-        it('manifests an instance of the provided type with the overrides applied', () => {
-          const manifested = realm.manifest(Car, {
+        expect(manifested).toEqual(
+          Car.encode({
+            make: 'Honda',
             model: 'CRV',
-          });
-
-          expect(manifested).toEqual(
-            Car.encode({
-              make: 'Honda',
-              model: 'CRV',
-            })
-          );
-        });
+          })
+        );
       });
     });
 
