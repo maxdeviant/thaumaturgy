@@ -1,5 +1,8 @@
 import { faker } from '@faker-js/faker';
+import * as E from 'fp-ts/Either';
+import * as O from 'fp-ts/Option';
 import * as t from 'io-ts';
+import { either, option } from 'io-ts-types';
 import { RealmStorage } from './realm-storage';
 import { ManifestedRef, MappedRef } from './ref';
 import { Define, EntityC, Manifest, Persist } from './types';
@@ -46,21 +49,43 @@ export class Realm {
   ) {
     const manifester = this.storage.findManifester(Entity.name);
 
-    const refs: ManifestedRef<any, any>[] = [];
-
     const manifestedEntity = manifester({ faker });
 
-    for (const [key, value] of Object.entries(manifestedEntity)) {
-      if (value instanceof MappedRef) {
-        if (key in overrides) {
-          continue;
-        }
+    const refs: ManifestedRef<any, any>[] = [];
 
+    for (const [key, value] of Object.entries(manifestedEntity)) {
+      if (key in overrides) {
+        continue;
+      }
+
+      if (value instanceof MappedRef) {
         const [manifestedRef, ...childRefs] = this.manifestRef(value);
 
         refs.push(manifestedRef, ...childRefs);
 
         manifestedEntity[key] = manifestedRef.mappedValue;
+      } else if (option(t.unknown).is(value)) {
+        if (O.isSome(value) && value.value instanceof MappedRef) {
+          const [manifestedRef, ...childRefs] = this.manifestRef(value.value);
+
+          refs.push(manifestedRef, ...childRefs);
+
+          manifestedEntity[key] = O.some(manifestedRef.mappedValue);
+        }
+      } else if (either(t.unknown, t.unknown).is(value)) {
+        if (E.isLeft(value) && value.left instanceof MappedRef) {
+          const [manifestedRef, ...childRefs] = this.manifestRef(value.left);
+
+          refs.push(manifestedRef, ...childRefs);
+
+          manifestedEntity[key] = E.left(manifestedRef.mappedValue);
+        } else if (E.isRight(value) && value.right instanceof MappedRef) {
+          const [manifestedRef, ...childRefs] = this.manifestRef(value.right);
+
+          refs.push(manifestedRef, ...childRefs);
+
+          manifestedEntity[key] = E.right(manifestedRef.mappedValue);
+        }
       }
     }
 
