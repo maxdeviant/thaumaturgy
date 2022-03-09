@@ -1,11 +1,17 @@
 import { faker } from '@faker-js/faker';
 import * as E from 'fp-ts/Either';
+import { pipe } from 'fp-ts/lib/function';
 import * as O from 'fp-ts/Option';
 import * as t from 'io-ts';
 import { either, option } from 'io-ts-types';
 import { RealmStorage } from './realm-storage';
 import { isMappedRef, ManifestedRef, MappedRef } from './ref';
 import { Define, EntityC, Manifest, Persist } from './types';
+
+interface Transform<T> {
+  is: (value: unknown) => value is T;
+  map: (container: T, f: (value: unknown) => unknown) => T;
+}
 
 export class Realm {
   private readonly storage = new RealmStorage();
@@ -61,22 +67,35 @@ export class Realm {
       return manifestedRef.mappedValue;
     };
 
+    const customContainers: Transform<any>[] = [
+      {
+        is: (_value: unknown): _value is unknown => true,
+        map: (container, f) => f(container),
+      },
+      {
+        is: option(t.unknown).is,
+        map: (container, f) => pipe(container, O.map(f)),
+      },
+      {
+        is: either(t.unknown, t.unknown).is,
+        map: (container, f) => pipe(container, E.bimap(f, f)),
+      },
+    ];
+
     for (const [key, value] of Object.entries(manifestedEntity)) {
       if (key in overrides) {
         continue;
       }
 
-      if (isMappedRef(value)) {
-        manifestedEntity[key] = processRef(value);
-      } else if (option(t.unknown).is(value)) {
-        if (O.isSome(value) && isMappedRef(value.value)) {
-          manifestedEntity[key] = O.some(processRef(value.value));
-        }
-      } else if (either(t.unknown, t.unknown).is(value)) {
-        if (E.isLeft(value) && isMappedRef(value.left)) {
-          manifestedEntity[key] = E.left(processRef(value.left));
-        } else if (E.isRight(value) && isMappedRef(value.right)) {
-          manifestedEntity[key] = E.right(processRef(value.right));
+      for (const container of customContainers) {
+        if (container.is(value)) {
+          manifestedEntity[key] = container.map(value, value => {
+            if (isMappedRef(value)) {
+              return processRef(value);
+            }
+
+            return value;
+          });
         }
       }
     }
