@@ -1,6 +1,5 @@
 import { faker } from '@faker-js/faker';
 import * as E from 'fp-ts/Either';
-import { pipe } from 'fp-ts/lib/function';
 import * as O from 'fp-ts/Option';
 import * as t from 'io-ts';
 import { either, option } from 'io-ts-types';
@@ -10,7 +9,7 @@ import { Define, EntityC, Manifest, Persist } from './types';
 
 interface Transform<T> {
   is: (value: unknown) => value is T;
-  map: (container: T, f: (value: unknown) => unknown) => T;
+  map: (f: (value: unknown) => unknown) => (container: T) => T;
 }
 
 export class Realm {
@@ -70,15 +69,15 @@ export class Realm {
     const customContainers: Transform<any>[] = [
       {
         is: (_value: unknown): _value is unknown => true,
-        map: (container, f) => f(container),
+        map: f => x => f(x),
       },
       {
         is: option(t.unknown).is,
-        map: (container, f) => pipe(container, O.map(f)),
+        map: O.map,
       },
       {
         is: either(t.unknown, t.unknown).is,
-        map: (container, f) => pipe(container, E.bimap(f, f)),
+        map: f => E.bimap(f, f),
       },
     ];
 
@@ -89,13 +88,13 @@ export class Realm {
 
       for (const container of customContainers) {
         if (container.is(value)) {
-          manifestedEntity[key] = container.map(value, value => {
+          manifestedEntity[key] = container.map(value => {
             if (isMappedRef(value)) {
               return processRef(value);
             }
 
             return value;
-          });
+          })(value);
         }
       }
     }
