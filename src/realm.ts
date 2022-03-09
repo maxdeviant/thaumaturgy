@@ -4,7 +4,7 @@ import * as O from 'fp-ts/Option';
 import * as t from 'io-ts';
 import { either, option } from 'io-ts-types';
 import { RealmStorage } from './realm-storage';
-import { ManifestedRef, MappedRef } from './ref';
+import { isMappedRef, ManifestedRef, MappedRef } from './ref';
 import { Define, EntityC, Manifest, Persist } from './types';
 
 export class Realm {
@@ -66,16 +66,17 @@ export class Realm {
         continue;
       }
 
-      if (value instanceof MappedRef) {
+      if (isMappedRef(value)) {
         manifestedEntity[key] = processRef(value);
+        continue;
       } else if (option(t.unknown).is(value)) {
-        if (O.isSome(value) && value.value instanceof MappedRef) {
+        if (O.isSome(value) && isMappedRef(value.value)) {
           manifestedEntity[key] = O.some(processRef(value.value));
         }
       } else if (either(t.unknown, t.unknown).is(value)) {
-        if (E.isLeft(value) && value.left instanceof MappedRef) {
+        if (E.isLeft(value) && isMappedRef(value.left)) {
           manifestedEntity[key] = E.left(processRef(value.left));
-        } else if (E.isRight(value) && value.right instanceof MappedRef) {
+        } else if (E.isRight(value) && isMappedRef(value.right)) {
           manifestedEntity[key] = E.right(processRef(value.right));
         }
       }

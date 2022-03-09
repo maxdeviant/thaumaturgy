@@ -16,6 +16,12 @@ export class Ref<C extends EntityC> {
 /**
  * @internal
  */
+export const isMappedRef = (value: unknown): value is MappedRef<any, any> =>
+  value instanceof MappedRef;
+
+/**
+ * @internal
+ */
 export class MappedRef<C extends EntityC, U> {
   constructor(
     readonly Entity: C,
