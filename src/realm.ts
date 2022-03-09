@@ -53,38 +53,30 @@ export class Realm {
 
     const refs: ManifestedRef<any, any>[] = [];
 
+    const processRef = (ref: MappedRef<any, any>) => {
+      const [manifestedRef, ...childRefs] = this.manifestRef(ref);
+
+      refs.push(manifestedRef, ...childRefs);
+
+      return manifestedRef.mappedValue;
+    };
+
     for (const [key, value] of Object.entries(manifestedEntity)) {
       if (key in overrides) {
         continue;
       }
 
       if (value instanceof MappedRef) {
-        const [manifestedRef, ...childRefs] = this.manifestRef(value);
-
-        refs.push(manifestedRef, ...childRefs);
-
-        manifestedEntity[key] = manifestedRef.mappedValue;
+        manifestedEntity[key] = processRef(value);
       } else if (option(t.unknown).is(value)) {
         if (O.isSome(value) && value.value instanceof MappedRef) {
-          const [manifestedRef, ...childRefs] = this.manifestRef(value.value);
-
-          refs.push(manifestedRef, ...childRefs);
-
-          manifestedEntity[key] = O.some(manifestedRef.mappedValue);
+          manifestedEntity[key] = O.some(processRef(value.value));
         }
       } else if (either(t.unknown, t.unknown).is(value)) {
         if (E.isLeft(value) && value.left instanceof MappedRef) {
-          const [manifestedRef, ...childRefs] = this.manifestRef(value.left);
-
-          refs.push(manifestedRef, ...childRefs);
-
-          manifestedEntity[key] = E.left(manifestedRef.mappedValue);
+          manifestedEntity[key] = E.left(processRef(value.left));
         } else if (E.isRight(value) && value.right instanceof MappedRef) {
-          const [manifestedRef, ...childRefs] = this.manifestRef(value.right);
-
-          refs.push(manifestedRef, ...childRefs);
-
-          manifestedEntity[key] = E.right(manifestedRef.mappedValue);
+          manifestedEntity[key] = E.right(processRef(value.right));
         }
       }
     }
