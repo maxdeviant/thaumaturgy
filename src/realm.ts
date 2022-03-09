@@ -1,19 +1,26 @@
 import { faker } from '@faker-js/faker';
-import * as E from 'fp-ts/Either';
-import * as O from 'fp-ts/Option';
 import * as t from 'io-ts';
-import { either, option } from 'io-ts-types';
 import { RealmStorage } from './realm-storage';
 import { isMappedRef, ManifestedRef, MappedRef } from './ref';
 import { Define, EntityC, Manifest, Persist } from './types';
 
-interface Transform<T> {
+export interface Traversal<T> {
   is: (value: unknown) => value is T;
-  map: (f: (value: unknown) => unknown) => (container: T) => T;
+  traverse: (f: (value: unknown) => unknown) => (container: T) => T;
 }
+
+const identityTraversal: Traversal<unknown> = {
+  is: (_value: unknown): _value is unknown => true,
+  traverse: f => x => f(x),
+};
 
 export class Realm {
   private readonly storage = new RealmStorage();
+  private readonly traversals: Traversal<any>[] = [identityTraversal];
+
+  readonly defineTraversal = <T>(traversal: Traversal<T>) => {
+    this.traversals.push(traversal);
+  };
 
   readonly define: Define = (
     Entity,
@@ -66,35 +73,22 @@ export class Realm {
       return manifestedRef.mappedValue;
     };
 
-    const customContainers: Transform<any>[] = [
-      {
-        is: (_value: unknown): _value is unknown => true,
-        map: f => x => f(x),
-      },
-      {
-        is: option(t.unknown).is,
-        map: O.map,
-      },
-      {
-        is: either(t.unknown, t.unknown).is,
-        map: f => E.bimap(f, f),
-      },
-    ];
+    const maybeProcessRef = (value: unknown) => {
+      if (isMappedRef(value)) {
+        return processRef(value);
+      }
+
+      return value;
+    };
 
     for (const [key, value] of Object.entries(manifestedEntity)) {
       if (key in overrides) {
         continue;
       }
 
-      for (const container of customContainers) {
-        if (container.is(value)) {
-          manifestedEntity[key] = container.map(value => {
-            if (isMappedRef(value)) {
-              return processRef(value);
-            }
-
-            return value;
-          })(value);
+      for (const traversal of this.traversals) {
+        if (traversal.is(value)) {
+          manifestedEntity[key] = traversal.traverse(maybeProcessRef)(value);
         }
       }
     }
