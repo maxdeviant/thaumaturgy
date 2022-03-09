@@ -2,9 +2,9 @@ import * as E from 'fp-ts/Either';
 import * as O from 'fp-ts/Option';
 import * as t from 'io-ts';
 import { either, option } from 'io-ts-types';
-import { Realm, Traversal } from './realm';
+import { Realm } from './realm';
 import { Ref } from './ref';
-import { ManifesterOptions } from './types';
+import { ManifesterOptions, Traversal } from './types';
 
 describe('Ref', () => {
   describe('when used inside of an `Option`', () => {

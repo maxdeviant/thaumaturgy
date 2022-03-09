@@ -2,12 +2,14 @@ import { faker } from '@faker-js/faker';
 import * as t from 'io-ts';
 import { RealmStorage } from './realm-storage';
 import { isMappedRef, ManifestedRef, MappedRef } from './ref';
-import { Define, EntityC, Manifest, Persist } from './types';
-
-export interface Traversal<T> {
-  is: (value: unknown) => value is T;
-  traverse: (f: (value: unknown) => unknown) => (container: T) => T;
-}
+import {
+  Define,
+  DefineTraversal,
+  EntityC,
+  Manifest,
+  Persist,
+  Traversal,
+} from './types';
 
 const identityTraversal: Traversal<unknown> = {
   is: (_value: unknown): _value is unknown => true,
@@ -18,7 +20,7 @@ export class Realm {
   private readonly storage = new RealmStorage();
   private readonly traversals: Traversal<any>[] = [identityTraversal];
 
-  readonly defineTraversal = <T>(traversal: Traversal<T>) => {
+  readonly defineTraversal: DefineTraversal = traversal => {
     this.traversals.push(traversal);
   };
 
