@@ -7,6 +7,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Fixed
+
+- Fixed persisting entity hierarchies when not using static identifiers
+
 ## [0.4.2] - 2022-03-06
 
 ### Changed

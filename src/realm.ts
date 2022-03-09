@@ -1,7 +1,7 @@
 import { faker } from '@faker-js/faker';
 import * as t from 'io-ts';
 import { RealmStorage } from './realm-storage';
-import { MappedRef } from './ref';
+import { ManifestedRef, MappedRef } from './ref';
 import { Define, EntityC, Manifest, Persist } from './types';
 
 export class Realm {
@@ -33,8 +33,8 @@ export class Realm {
 
     const { manifestedEntity, refs } = this.manifestWithRefs(Entity, overrides);
 
-    for (const ref of refs) {
-      await this.persist(ref.Entity);
+    for (const ref of refs.reverse()) {
+      await this.persistRef(ref);
     }
 
     return persister(manifestedEntity);
@@ -46,7 +46,7 @@ export class Realm {
   ) {
     const manifester = this.storage.findManifester(Entity.name);
 
-    const refs: MappedRef<any, any>[] = [];
+    const refs: ManifestedRef<any, any>[] = [];
 
     const manifestedEntity = manifester({ faker });
 
@@ -56,9 +56,11 @@ export class Realm {
           continue;
         }
 
-        refs.push(value);
+        const [manifestedRef, ...childRefs] = this.manifestRef(value);
 
-        manifestedEntity[key] = value.manifest(this);
+        refs.push(manifestedRef, ...childRefs);
+
+        manifestedEntity[key] = manifestedRef.mappedValue;
       }
     }
 
@@ -67,5 +69,26 @@ export class Realm {
     }
 
     return { manifestedEntity, refs };
+  }
+
+  private manifestRef<C extends EntityC>(
+    ref: MappedRef<C, any>
+  ): [ManifestedRef<C, any>, ...ManifestedRef<any, any>[]] {
+    const { manifestedEntity, refs } = this.manifestWithRefs(ref.Entity, {});
+
+    return [
+      new ManifestedRef(
+        ref.Entity,
+        manifestedEntity,
+        ref.mapping(manifestedEntity)
+      ),
+      ...refs,
+    ];
+  }
+
+  private persistRef<C extends EntityC>(ref: ManifestedRef<C, unknown>) {
+    const persister = this.storage.findPersister(ref.Entity.name);
+
+    return persister(ref.entity);
   }
 }

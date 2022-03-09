@@ -1,5 +1,4 @@
 import * as t from 'io-ts';
-import { Realm } from './realm';
 import { EntityC } from './types';
 
 export class Ref<C extends EntityC> {
@@ -20,10 +19,17 @@ export class Ref<C extends EntityC> {
 export class MappedRef<C extends EntityC, U> {
   constructor(
     readonly Entity: C,
-    private readonly mapping: (entity: t.OutputOf<C>) => U
+    readonly mapping: (entity: t.OutputOf<C>) => U
   ) {}
+}
 
-  manifest(realm: Realm) {
-    return this.mapping(realm.manifest(this.Entity));
-  }
+/**
+ * @internal
+ */
+export class ManifestedRef<C extends EntityC, U> {
+  constructor(
+    readonly Entity: C,
+    readonly entity: t.OutputOf<C>,
+    readonly mappedValue: U
+  ) {}
 }
