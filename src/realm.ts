@@ -1,11 +1,28 @@
 import { faker } from '@faker-js/faker';
 import * as t from 'io-ts';
 import { RealmStorage } from './realm-storage';
-import { ManifestedRef, MappedRef } from './ref';
-import { Define, EntityC, Manifest, Persist } from './types';
+import { isMappedRef, ManifestedRef, MappedRef } from './ref';
+import {
+  Define,
+  DefineTraversal,
+  EntityC,
+  Manifest,
+  Persist,
+  Traversal,
+} from './types';
+
+const identityTraversal: Traversal<unknown> = {
+  is: (_value: unknown): _value is unknown => true,
+  traverse: f => x => f(x),
+};
 
 export class Realm {
   private readonly storage = new RealmStorage();
+  private readonly traversals: Traversal<any>[] = [identityTraversal];
+
+  readonly defineTraversal: DefineTraversal = traversal => {
+    this.traversals.push(traversal);
+  };
 
   readonly define: Define = (
     Entity,
@@ -46,21 +63,35 @@ export class Realm {
   ) {
     const manifester = this.storage.findManifester(Entity.name);
 
-    const refs: ManifestedRef<any, any>[] = [];
-
     const manifestedEntity = manifester({ faker });
 
+    const refs: ManifestedRef<any, any>[] = [];
+
+    const processRef = (ref: MappedRef<any, any>) => {
+      const [manifestedRef, ...childRefs] = this.manifestRef(ref);
+
+      refs.push(manifestedRef, ...childRefs);
+
+      return manifestedRef.mappedValue;
+    };
+
+    const maybeProcessRef = (value: unknown) => {
+      if (isMappedRef(value)) {
+        return processRef(value);
+      }
+
+      return value;
+    };
+
     for (const [key, value] of Object.entries(manifestedEntity)) {
-      if (value instanceof MappedRef) {
-        if (key in overrides) {
-          continue;
+      if (key in overrides) {
+        continue;
+      }
+
+      for (const traversal of this.traversals) {
+        if (traversal.is(value)) {
+          manifestedEntity[key] = traversal.traverse(maybeProcessRef)(value);
         }
-
-        const [manifestedRef, ...childRefs] = this.manifestRef(value);
-
-        refs.push(manifestedRef, ...childRefs);
-
-        manifestedEntity[key] = manifestedRef.mappedValue;
       }
     }
 
