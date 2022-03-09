@@ -68,7 +68,6 @@ export class Realm {
 
       if (isMappedRef(value)) {
         manifestedEntity[key] = processRef(value);
-        continue;
       } else if (option(t.unknown).is(value)) {
         if (O.isSome(value) && isMappedRef(value.value)) {
           manifestedEntity[key] = O.some(processRef(value.value));
