@@ -60,9 +60,19 @@ export class Realm {
       return manifestedRef.mappedValue;
     };
 
-    const maybeProcessRef = (value: unknown) => {
+    const processValue = (value: unknown) => {
       if (isMappedRef(value)) {
         return processRef(value);
+      }
+
+      if (t.UnknownRecord.is(value)) {
+        const acc: Record<string, unknown> = {};
+
+        for (const [subKey, subValue] of Object.entries(value)) {
+          acc[subKey] = processValue(subValue);
+        }
+
+        return acc;
       }
 
       return value;
@@ -73,21 +83,7 @@ export class Realm {
         continue;
       }
 
-      if (isMappedRef(value)) {
-        manifestedEntity[key] = processRef(value);
-        continue;
-      }
-
-      if (t.UnknownRecord.is(value)) {
-        const acc: Record<string, unknown> = {};
-
-        for (const [subKey, subValue] of Object.entries(value)) {
-          acc[subKey] = maybeProcessRef(subValue);
-        }
-
-        manifestedEntity[key] = acc;
-        continue;
-      }
+      manifestedEntity[key] = processValue(value);
     }
 
     for (const key in overrides) {
