@@ -26,6 +26,28 @@ describe('Public API', () => {
     });
   });
 
+  it('works with an entity containing an array field', () => {
+    const Post = t.strict({
+      title: t.string,
+      tags: t.array(t.string),
+    });
+
+    define(Post, {
+      manifest: ({ faker }) =>
+        Post.encode({
+          title: faker.random.words(),
+          tags: [faker.random.word(), faker.random.word(), faker.random.word()],
+        }),
+    });
+
+    const post = manifest(Post);
+
+    expect(post).toEqual({
+      title: expect.any(String),
+      tags: [expect.any(String), expect.any(String), expect.any(String)],
+    });
+  });
+
   it('works with an entity hierarchy', () => {
     const Author = t.type({
       id: t.string,

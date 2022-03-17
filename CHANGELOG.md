@@ -7,6 +7,14 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Added
+
+- Added support for auto-traversals to search for `Ref`s
+
+### Removed
+
+- Removed `defineTraversal`, as it is obviated by auto-traversals
+
 ## [0.5.0] - 2022-03-09
 
 ### Added

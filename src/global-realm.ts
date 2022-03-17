@@ -2,6 +2,6 @@ import { Realm } from './realm';
 
 const globalRealm = new Realm();
 
-const { define, defineTraversal, manifest, persist } = globalRealm;
+const { define, manifest, persist } = globalRealm;
 
-export { define, defineTraversal, manifest, persist };
+export { define, manifest, persist };
