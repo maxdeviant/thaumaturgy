@@ -116,4 +116,78 @@ describe('Ref', () => {
       });
     });
   });
+
+  describe('when used inside of a deeply-nested object', () => {
+    it(`calls the referenced entity's manifester`, () => {
+      const realm = new Realm();
+
+      const Author = t.strict({ id: t.string });
+
+      const Post = t.strict({
+        id: t.string,
+        a: t.strict({
+          u: t.strict({
+            t: t.strict({
+              h: t.strict({
+                o: t.strict({
+                  r: t.strict({
+                    id: t.string,
+                  }),
+                }),
+              }),
+            }),
+          }),
+        }),
+      });
+
+      const authorManifester = jest.fn<
+        t.TypeOf<typeof Author>,
+        [ManifesterOptions]
+      >(({ faker }) => Author.encode({ id: faker.datatype.uuid() }));
+
+      realm.define(Author, {
+        manifest: authorManifester,
+      });
+
+      realm.define(Post, {
+        manifest: ({ faker }) =>
+          Post.encode({
+            id: faker.datatype.uuid(),
+            a: {
+              u: {
+                t: {
+                  h: {
+                    o: {
+                      r: {
+                        id: Ref.to(Author).through(author => author.id),
+                      },
+                    },
+                  },
+                },
+              },
+            },
+          }),
+      });
+
+      const post = realm.manifest(Post);
+
+      expect(post).toMatchObject({
+        a: {
+          u: {
+            t: {
+              h: {
+                o: {
+                  r: {
+                    id: expect.any(String),
+                  },
+                },
+              },
+            },
+          },
+        },
+      });
+
+      expect(authorManifester).toHaveBeenCalled();
+    });
+  });
 });
