@@ -2,12 +2,10 @@ import { faker } from '@faker-js/faker';
 import * as t from 'io-ts';
 import { RealmStorage } from './realm-storage';
 import { isMappedRef, ManifestedRef, MappedRef } from './ref';
-import { Define, DefineTraversal, EntityC, Manifest, Persist } from './types';
+import { Define, EntityC, Manifest, Persist } from './types';
 
 export class Realm {
   private readonly storage = new RealmStorage();
-
-  readonly defineTraversal: DefineTraversal = _traversal => {};
 
   readonly define: Define = (
     Entity,

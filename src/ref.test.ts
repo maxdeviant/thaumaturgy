@@ -4,17 +4,12 @@ import * as t from 'io-ts';
 import { either, option } from 'io-ts-types';
 import { Realm } from './realm';
 import { Ref } from './ref';
-import { ManifesterOptions, Traversal } from './types';
+import { ManifesterOptions } from './types';
 
 describe('Ref', () => {
   describe('when used inside of an `Option`', () => {
     it(`calls the referenced entity's manifester`, () => {
       const realm = new Realm();
-
-      realm.defineTraversal({
-        is: option(t.unknown).is,
-        traverse: O.map,
-      });
 
       const Author = t.strict({ id: t.string });
 
@@ -49,16 +44,9 @@ describe('Ref', () => {
   });
 
   describe('when used inside of an `Either`', () => {
-    const eitherTraversal: Traversal<E.Either<unknown, unknown>> = {
-      is: either(t.unknown, t.unknown).is,
-      traverse: f => E.bimap(f, f),
-    };
-
     describe('inside of a `Left`', () => {
       it(`calls the referenced entity's manifester`, () => {
         const realm = new Realm();
-
-        realm.defineTraversal(eitherTraversal);
 
         const Author = t.strict({ id: t.string });
 
@@ -95,8 +83,6 @@ describe('Ref', () => {
     describe('inside of a `Right`', () => {
       it(`calls the referenced entity's manifester`, () => {
         const realm = new Realm();
-
-        realm.defineTraversal(eitherTraversal);
 
         const Author = t.strict({ id: t.string });
 
