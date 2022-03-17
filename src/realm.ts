@@ -2,27 +2,12 @@ import { faker } from '@faker-js/faker';
 import * as t from 'io-ts';
 import { RealmStorage } from './realm-storage';
 import { isMappedRef, ManifestedRef, MappedRef } from './ref';
-import {
-  Define,
-  DefineTraversal,
-  EntityC,
-  Manifest,
-  Persist,
-  Traversal,
-} from './types';
-
-const identityTraversal: Traversal<unknown> = {
-  is: (_value: unknown): _value is unknown => true,
-  traverse: f => x => f(x),
-};
+import { Define, DefineTraversal, EntityC, Manifest, Persist } from './types';
 
 export class Realm {
   private readonly storage = new RealmStorage();
-  private readonly traversals: Traversal<any>[] = [identityTraversal];
 
-  readonly defineTraversal: DefineTraversal = traversal => {
-    this.traversals.push(traversal);
-  };
+  readonly defineTraversal: DefineTraversal = _traversal => {};
 
   readonly define: Define = (
     Entity,
@@ -88,10 +73,20 @@ export class Realm {
         continue;
       }
 
-      for (const traversal of this.traversals) {
-        if (traversal.is(value)) {
-          manifestedEntity[key] = traversal.traverse(maybeProcessRef)(value);
+      if (isMappedRef(value)) {
+        manifestedEntity[key] = processRef(value);
+        continue;
+      }
+
+      if (t.UnknownRecord.is(value)) {
+        const acc: Record<string, unknown> = {};
+
+        for (const [subKey, subValue] of Object.entries(value)) {
+          acc[subKey] = maybeProcessRef(subValue);
         }
+
+        manifestedEntity[key] = acc;
+        continue;
       }
     }
 
