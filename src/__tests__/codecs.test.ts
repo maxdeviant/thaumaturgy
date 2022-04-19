@@ -9,7 +9,7 @@ describe('io-ts Codecs', () => {
       const Type = t.type({ check: t.boolean });
 
       realm.define(Type, {
-        manifest: () => Type.encode({ check: true }),
+        manifest: () => ({ check: true }),
       });
 
       expect(realm.manifest(Type)).toEqual({ check: true });
@@ -23,7 +23,7 @@ describe('io-ts Codecs', () => {
       const Strict = t.strict({ check: t.boolean });
 
       realm.define(Strict, {
-        manifest: () => Strict.encode({ check: true }),
+        manifest: () => ({ check: true }),
       });
 
       expect(realm.manifest(Strict)).toEqual({ check: true });
@@ -38,7 +38,7 @@ describe('io-ts Codecs', () => {
         const ReadonlyType = t.readonly(t.type({ check: t.boolean }));
 
         realm.define(ReadonlyType, {
-          manifest: () => ReadonlyType.encode({ check: true }),
+          manifest: () => ({ check: true }),
         });
 
         expect(realm.manifest(ReadonlyType)).toEqual({ check: true });
@@ -52,7 +52,7 @@ describe('io-ts Codecs', () => {
         const ReadonlyStrict = t.readonly(t.strict({ check: t.boolean }));
 
         realm.define(ReadonlyStrict, {
-          manifest: () => ReadonlyStrict.encode({ check: true }),
+          manifest: () => ({ check: true }),
         });
 
         expect(realm.manifest(ReadonlyStrict)).toEqual({ check: true });
@@ -69,8 +69,7 @@ describe('io-ts Codecs', () => {
           );
 
           realm.define(ReadonlyIntersection, {
-            manifest: () =>
-              ReadonlyIntersection.encode({ a: 'hello', b: 'world' }),
+            manifest: () => ({ a: 'hello', b: 'world' }),
           });
 
           const manifested = realm.manifest(ReadonlyIntersection);
@@ -92,8 +91,7 @@ describe('io-ts Codecs', () => {
           );
 
           realm.define(ReadonlyStrictIntersection, {
-            manifest: () =>
-              ReadonlyStrictIntersection.encode({ a: 'hello', b: 'world' }),
+            manifest: () => ({ a: 'hello', b: 'world' }),
           });
 
           const manifested = realm.manifest(ReadonlyStrictIntersection);
@@ -102,6 +100,33 @@ describe('io-ts Codecs', () => {
           expect(manifested.b).toBe('world');
         });
       });
+    });
+  });
+
+  describe('with a `brand` codec', () => {
+    interface PositiveBrand {
+      readonly Positive: unique symbol;
+    }
+
+    const Positive = t.brand(
+      t.number,
+      (n): n is t.Branded<number, PositiveBrand> => 0 < n,
+      'Positive'
+    );
+
+    type Positive = t.TypeOf<typeof Positive>;
+
+    it('works', () => {
+      const realm = new Realm();
+
+      realm.define(Positive, {
+        manifest: () => 7 as Positive,
+      });
+
+      const manifested = realm.manifest(Positive);
+
+      expect(Positive.is(manifested)).toBe(true);
+      expect(manifested).toBe(7);
     });
   });
 });

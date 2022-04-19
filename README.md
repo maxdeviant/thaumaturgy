@@ -34,11 +34,10 @@ const Movie = t.strict({
 });
 
 define(Movie, {
-  manifest: ({ faker }) =>
-    Movie.encode({
-      title: faker.random.words(),
-      year: faker.date.past(10).getFullYear(),
-    }),
+  manifest: ({ faker }) => ({
+    title: faker.random.words(),
+    year: faker.date.past(10).getFullYear(),
+  }),
 });
 
 const movie = manifest(Movie);
@@ -65,20 +64,18 @@ const Book = t.type({
 });
 
 define(Author, {
-  manifest: ({ faker }) =>
-    Author.encode({
-      id: faker.datatype.uuid(),
-      name: faker.name.findName(),
-    }),
+  manifest: ({ faker }) => ({
+    id: faker.datatype.uuid(),
+    name: faker.name.findName(),
+  }),
 });
 
 define(Book, {
-  manifest: ({ faker }) =>
-    Book.encode({
-      id: faker.datatype.uuid(),
-      authorId: Ref.to(Author).through(author => author.id),
-      title: faker.random.words(),
-    }),
+  manifest: ({ faker }) => ({
+    id: faker.datatype.uuid(),
+    authorId: Ref.to(Author).through(author => author.id),
+    title: faker.random.words(),
+  }),
 });
 
 const book = manifest(Book);

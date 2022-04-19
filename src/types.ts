@@ -20,15 +20,15 @@ export interface DefineOptions<T> {
 
 export type Define = <C extends EntityC>(
   Entity: C,
-  options: DefineOptions<t.OutputOf<C>>
+  options: DefineOptions<t.TypeOf<C>>
 ) => void;
 
 export type Manifest = <C extends EntityC>(
   Entity: C,
-  overrides?: Partial<t.OutputOf<C>>
-) => t.OutputOf<C>;
+  overrides?: Partial<t.TypeOf<C>>
+) => t.TypeOf<C>;
 
 export type Persist = <C extends EntityC>(
   Entity: C,
-  overrides?: Partial<t.OutputOf<C>>
-) => Promise<t.OutputOf<C>>;
+  overrides?: Partial<t.TypeOf<C>>
+) => Promise<t.TypeOf<C>>;

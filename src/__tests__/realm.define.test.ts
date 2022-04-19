@@ -9,13 +9,16 @@ describe('Realm', () => {
       year: t.Int,
     });
 
+    type Movie = t.TypeOf<typeof Movie>;
+
     describe('when `manifest` is invoked', () => {
       it('calls the manifester', () => {
         const realm = new Realm();
 
-        const manifester = jest.fn(() =>
-          Movie.encode({ title: 'Pulp Fiction', year: 1994 as t.Int })
-        );
+        const manifester = jest.fn<Movie, []>(() => ({
+          title: 'Pulp Fiction',
+          year: 1994 as t.Int,
+        }));
 
         realm.define(Movie, { manifest: manifester });
 
@@ -27,9 +30,10 @@ describe('Realm', () => {
       it('passes a Faker instance to the manifester', () => {
         const realm = new Realm();
 
-        const manifester = jest.fn(() =>
-          Movie.encode({ title: 'Pulp Fiction', year: 1994 as t.Int })
-        );
+        const manifester = jest.fn<Movie, []>(() => ({
+          title: 'Pulp Fiction',
+          year: 1994 as t.Int,
+        }));
 
         realm.define(Movie, { manifest: manifester });
 
@@ -48,8 +52,7 @@ describe('Realm', () => {
         const persister = jest.fn(movie => Promise.resolve(movie));
 
         realm.define(Movie, {
-          manifest: () =>
-            Movie.encode({ title: 'Arrival', year: 2017 as t.Int }),
+          manifest: () => ({ title: 'Arrival', year: 2017 as t.Int }),
           persist: persister,
         });
 
@@ -64,19 +67,16 @@ describe('Realm', () => {
         const persister = jest.fn(movie => Promise.resolve(movie));
 
         realm.define(Movie, {
-          manifest: () =>
-            Movie.encode({ title: 'Arrival', year: 2017 as t.Int }),
+          manifest: () => ({ title: 'Arrival', year: 2017 as t.Int }),
           persist: persister,
         });
 
         await realm.persist(Movie);
 
-        expect(persister).toHaveBeenCalledWith(
-          Movie.encode({
-            title: 'Arrival',
-            year: 2017 as t.Int,
-          })
-        );
+        expect(persister).toHaveBeenCalledWith({
+          title: 'Arrival',
+          year: 2017 as t.Int,
+        });
       });
     });
   });

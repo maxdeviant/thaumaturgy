@@ -21,18 +21,17 @@ describe('Ref', () => {
       const authorManifester = jest.fn<
         t.TypeOf<typeof Author>,
         [ManifesterOptions]
-      >(({ faker }) => Author.encode({ id: faker.datatype.uuid() }));
+      >(({ faker }) => ({ id: faker.datatype.uuid() }));
 
       realm.define(Author, {
         manifest: authorManifester,
       });
 
       realm.define(Post, {
-        manifest: ({ faker }) =>
-          Post.encode({
-            id: faker.datatype.uuid(),
-            authorId: O.some(Ref.to(Author).through(author => author.id)),
-          }),
+        manifest: ({ faker }) => ({
+          id: faker.datatype.uuid(),
+          authorId: O.some(Ref.to(Author).through(author => author.id)),
+        }),
       });
 
       const post = realm.manifest(Post);
@@ -58,18 +57,17 @@ describe('Ref', () => {
         const authorManifester = jest.fn<
           t.TypeOf<typeof Author>,
           [ManifesterOptions]
-        >(({ faker }) => Author.encode({ id: faker.datatype.uuid() }));
+        >(({ faker }) => ({ id: faker.datatype.uuid() }));
 
         realm.define(Author, {
           manifest: authorManifester,
         });
 
         realm.define(Post, {
-          manifest: ({ faker }) =>
-            Post.encode({
-              id: faker.datatype.uuid(),
-              authorId: E.left(Ref.to(Author).through(author => author.id)),
-            }),
+          manifest: ({ faker }) => ({
+            id: faker.datatype.uuid(),
+            authorId: E.left(Ref.to(Author).through(author => author.id)),
+          }),
         });
 
         const post = realm.manifest(Post);
@@ -94,18 +92,17 @@ describe('Ref', () => {
         const authorManifester = jest.fn<
           t.TypeOf<typeof Author>,
           [ManifesterOptions]
-        >(({ faker }) => Author.encode({ id: faker.datatype.uuid() }));
+        >(({ faker }) => ({ id: faker.datatype.uuid() }));
 
         realm.define(Author, {
           manifest: authorManifester,
         });
 
         realm.define(Post, {
-          manifest: ({ faker }) =>
-            Post.encode({
-              id: faker.datatype.uuid(),
-              authorId: E.right(Ref.to(Author).through(author => author.id)),
-            }),
+          manifest: ({ faker }) => ({
+            id: faker.datatype.uuid(),
+            authorId: E.right(Ref.to(Author).through(author => author.id)),
+          }),
         });
 
         const post = realm.manifest(Post);
@@ -143,30 +140,29 @@ describe('Ref', () => {
       const authorManifester = jest.fn<
         t.TypeOf<typeof Author>,
         [ManifesterOptions]
-      >(({ faker }) => Author.encode({ id: faker.datatype.uuid() }));
+      >(({ faker }) => ({ id: faker.datatype.uuid() }));
 
       realm.define(Author, {
         manifest: authorManifester,
       });
 
       realm.define(Post, {
-        manifest: ({ faker }) =>
-          Post.encode({
-            id: faker.datatype.uuid(),
-            a: {
-              u: {
-                t: {
-                  h: {
-                    o: {
-                      r: {
-                        id: Ref.to(Author).through(author => author.id),
-                      },
+        manifest: ({ faker }) => ({
+          id: faker.datatype.uuid(),
+          a: {
+            u: {
+              t: {
+                h: {
+                  o: {
+                    r: {
+                      id: Ref.to(Author).through(author => author.id),
                     },
                   },
                 },
               },
             },
-          }),
+          },
+        }),
       });
 
       const post = realm.manifest(Post);

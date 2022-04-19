@@ -11,11 +11,10 @@ describe('Public API', () => {
     });
 
     define(Movie, {
-      manifest: ({ faker }) =>
-        Movie.encode({
-          title: faker.random.words(),
-          year: faker.date.past(10).getFullYear(),
-        }),
+      manifest: ({ faker }) => ({
+        title: faker.random.words(),
+        year: faker.date.past(10).getFullYear(),
+      }),
     });
 
     const movie = manifest(Movie);
@@ -33,11 +32,10 @@ describe('Public API', () => {
     });
 
     define(Post, {
-      manifest: ({ faker }) =>
-        Post.encode({
-          title: faker.random.words(),
-          tags: [faker.random.word(), faker.random.word(), faker.random.word()],
-        }),
+      manifest: ({ faker }) => ({
+        title: faker.random.words(),
+        tags: [faker.random.word(), faker.random.word(), faker.random.word()],
+      }),
     });
 
     const post = manifest(Post);
@@ -61,20 +59,18 @@ describe('Public API', () => {
     });
 
     define(Author, {
-      manifest: ({ faker }) =>
-        Author.encode({
-          id: faker.datatype.uuid(),
-          name: faker.name.findName(),
-        }),
+      manifest: ({ faker }) => ({
+        id: faker.datatype.uuid(),
+        name: faker.name.findName(),
+      }),
     });
 
     define(Book, {
-      manifest: ({ faker }) =>
-        Book.encode({
-          id: faker.datatype.uuid(),
-          authorId: Ref.to(Author).through(author => author.id),
-          title: faker.random.words(),
-        }),
+      manifest: ({ faker }) => ({
+        id: faker.datatype.uuid(),
+        authorId: Ref.to(Author).through(author => author.id),
+        title: faker.random.words(),
+      }),
     });
 
     const book = manifest(Book);

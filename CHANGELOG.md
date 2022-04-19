@@ -7,6 +7,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Changed
+
+- Manifesters now work off of the codec's type (`A`) as opposed to its output type (`O`)
+
 ## [0.6.0] - 2022-03-16
 
 ### Added

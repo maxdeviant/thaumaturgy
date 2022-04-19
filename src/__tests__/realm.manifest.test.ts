@@ -13,11 +13,10 @@ describe('Realm', () => {
 
     beforeAll(() => {
       realm.define(Car, {
-        manifest: () =>
-          Car.encode({
-            make: 'Honda',
-            model: 'Civic',
-          }),
+        manifest: () => ({
+          make: 'Honda',
+          model: 'Civic',
+        }),
       });
     });
 
@@ -25,12 +24,10 @@ describe('Realm', () => {
       it('manifests an instance of the provided type', () => {
         const manifested = realm.manifest(Car);
 
-        expect(manifested).toEqual(
-          Car.encode({
-            make: 'Honda',
-            model: 'Civic',
-          })
-        );
+        expect(manifested).toEqual({
+          make: 'Honda',
+          model: 'Civic',
+        });
       });
     });
 
@@ -40,12 +37,10 @@ describe('Realm', () => {
           model: 'CRV',
         });
 
-        expect(manifested).toEqual(
-          Car.encode({
-            make: 'Honda',
-            model: 'CRV',
-          })
-        );
+        expect(manifested).toEqual({
+          make: 'Honda',
+          model: 'CRV',
+        });
       });
     });
 
@@ -59,31 +54,25 @@ describe('Realm', () => {
       const performSetup = () => {
         const realm = new Realm();
 
-        const kingdomManifester = jest.fn(() =>
-          Kingdom.encode({ name: 'Animalia' })
-        );
+        const kingdomManifester = jest.fn(() => ({ name: 'Animalia' }));
 
         realm.define(Kingdom, {
           manifest: kingdomManifester,
         });
 
-        const phylumManifester = jest.fn(() =>
-          Phylum.encode({
-            kingdom: Ref.to(Kingdom).through(kingdom => kingdom.name),
-            name: 'Chordata',
-          })
-        );
+        const phylumManifester = jest.fn(() => ({
+          kingdom: Ref.to(Kingdom).through(kingdom => kingdom.name),
+          name: 'Chordata',
+        }));
 
         realm.define(Phylum, {
           manifest: phylumManifester,
         });
 
-        const classManifester = jest.fn(() =>
-          Class.encode({
-            phylum: Ref.to(Phylum).through(phylum => phylum.name),
-            name: 'Mammalia',
-          })
-        );
+        const classManifester = jest.fn(() => ({
+          phylum: Ref.to(Phylum).through(phylum => phylum.name),
+          name: 'Mammalia',
+        }));
 
         realm.define(Class, {
           manifest: classManifester,

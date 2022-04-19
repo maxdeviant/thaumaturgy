@@ -42,7 +42,7 @@ export class Realm {
 
   private manifestWithRefs<C extends EntityC>(
     Entity: C,
-    overrides: Partial<t.OutputOf<C>>
+    overrides: Partial<t.TypeOf<C>>
   ) {
     const manifester = this.storage.findManifester(Entity.name);
 

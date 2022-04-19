@@ -28,11 +28,10 @@ describe('Realm', () => {
       const realm = new Realm();
 
       realm.define(Car, {
-        manifest: () =>
-          Car.encode({
-            make: 'Honda',
-            model: 'Civic',
-          }),
+        manifest: () => ({
+          make: 'Honda',
+          model: 'Civic',
+        }),
         persist: async car => {
           await db.run('insert into car values (?, ?)', car.make, car.model);
 
@@ -49,12 +48,10 @@ describe('Realm', () => {
 
         const persisted = await realm.persist(Car);
 
-        expect(persisted).toEqual(
-          Car.encode({
-            make: 'Honda',
-            model: 'Civic',
-          })
-        );
+        expect(persisted).toEqual({
+          make: 'Honda',
+          model: 'Civic',
+        });
 
         const carFromDatabase = await db.get('select make, model from car');
 
@@ -70,12 +67,10 @@ describe('Realm', () => {
           model: 'CRV',
         });
 
-        expect(persisted).toEqual(
-          Car.encode({
-            make: 'Honda',
-            model: 'CRV',
-          })
-        );
+        expect(persisted).toEqual({
+          make: 'Honda',
+          model: 'CRV',
+        });
 
         const carFromDatabase = await db.get('select make, model from car');
 
@@ -105,7 +100,7 @@ describe('Realm', () => {
         const realm = new Realm();
 
         realm.define(Kingdom, {
-          manifest: () => Kingdom.encode({ name: 'Animalia' }),
+          manifest: () => ({ name: 'Animalia' }),
           persist: async kingdom => {
             await db.run('insert into kingdom values (?)', kingdom.name);
 
@@ -114,11 +109,10 @@ describe('Realm', () => {
         });
 
         realm.define(Phylum, {
-          manifest: () =>
-            Phylum.encode({
-              kingdom: Ref.to(Kingdom).through(kingdom => kingdom.name),
-              name: 'Chordata',
-            }),
+          manifest: () => ({
+            kingdom: Ref.to(Kingdom).through(kingdom => kingdom.name),
+            name: 'Chordata',
+          }),
           persist: async phylum => {
             await db.run(
               'insert into phylum values (?, ?)',
@@ -131,11 +125,10 @@ describe('Realm', () => {
         });
 
         realm.define(Class, {
-          manifest: () =>
-            Class.encode({
-              phylum: Ref.to(Phylum).through(phylum => phylum.name),
-              name: 'Mammalia',
-            }),
+          manifest: () => ({
+            phylum: Ref.to(Phylum).through(phylum => phylum.name),
+            name: 'Mammalia',
+          }),
           persist: async class_ => {
             await db.run(
               'insert into class values (?, ?)',
@@ -155,12 +148,10 @@ describe('Realm', () => {
 
         const persisted = await realm.persist(Class);
 
-        expect(persisted).toEqual(
-          Class.encode({
-            phylum: 'Chordata',
-            name: 'Mammalia',
-          })
-        );
+        expect(persisted).toEqual({
+          phylum: 'Chordata',
+          name: 'Mammalia',
+        });
 
         const classFromDatabase = await db.get(
           'select phylum, name from class'
@@ -172,18 +163,14 @@ describe('Realm', () => {
           'select kingdom, name from phylum'
         );
 
-        expect(phylumFromDatabase).toEqual(
-          Phylum.encode({
-            kingdom: 'Animalia',
-            name: 'Chordata',
-          })
-        );
+        expect(phylumFromDatabase).toEqual({
+          kingdom: 'Animalia',
+          name: 'Chordata',
+        });
 
         const kingdomFromDatabase = await db.get('select name from kingdom');
 
-        expect(kingdomFromDatabase).toEqual(
-          Kingdom.encode({ name: 'Animalia' })
-        );
+        expect(kingdomFromDatabase).toEqual({ name: 'Animalia' });
       });
     });
 
@@ -225,11 +212,10 @@ describe('Realm', () => {
         const realm = new Realm();
 
         realm.define(Author, {
-          manifest: ({ faker }) =>
-            Author.encode({
-              id: faker.datatype.uuid(),
-              name: faker.name.findName(),
-            }),
+          manifest: ({ faker }) => ({
+            id: faker.datatype.uuid(),
+            name: faker.name.findName(),
+          }),
           persist: async author => {
             await db.run(
               'insert into author (id, name) values (?, ?)',
@@ -242,12 +228,11 @@ describe('Realm', () => {
         });
 
         realm.define(Post, {
-          manifest: ({ faker }) =>
-            Post.encode({
-              id: faker.datatype.uuid(),
-              authorId: Ref.to(Author).through(author => author.id),
-              title: faker.random.words(),
-            }),
+          manifest: ({ faker }) => ({
+            id: faker.datatype.uuid(),
+            authorId: Ref.to(Author).through(author => author.id),
+            title: faker.random.words(),
+          }),
           persist: async post => {
             await db.run(
               'insert into post (id, author_id, title) values (?, ?, ?)',
@@ -261,12 +246,11 @@ describe('Realm', () => {
         });
 
         realm.define(Comment, {
-          manifest: ({ faker }) =>
-            Comment.encode({
-              id: faker.datatype.uuid(),
-              postId: Ref.to(Post).through(post => post.id),
-              username: faker.internet.userName(),
-            }),
+          manifest: ({ faker }) => ({
+            id: faker.datatype.uuid(),
+            postId: Ref.to(Post).through(post => post.id),
+            username: faker.internet.userName(),
+          }),
           persist: async comment => {
             await db.run(
               'insert into comment (id, post_id, username) values (?, ?, ?)',
