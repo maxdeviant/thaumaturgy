@@ -1,5 +1,6 @@
 import { Faker } from '@faker-js/faker';
 import * as t from 'io-ts';
+import { PartialDeep } from 'type-fest';
 
 export type EntityName = string;
 
@@ -25,10 +26,10 @@ export type Define = <C extends EntityC>(
 
 export type Manifest = <C extends EntityC>(
   Entity: C,
-  overrides?: Partial<t.TypeOf<C>>
+  overrides?: PartialDeep<t.TypeOf<C>>
 ) => t.TypeOf<C>;
 
 export type Persist = <C extends EntityC>(
   Entity: C,
-  overrides?: Partial<t.TypeOf<C>>
+  overrides?: PartialDeep<t.TypeOf<C>>
 ) => Promise<t.TypeOf<C>>;

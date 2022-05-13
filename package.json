@@ -33,7 +33,8 @@
     "io-ts": "2.x"
   },
   "dependencies": {
-    "@faker-js/faker": "6.0.0-alpha.7"
+    "@faker-js/faker": "6.0.0-alpha.7",
+    "type-fest": "2.12.2"
   },
   "devDependencies": {
     "@types/jest": "27.4.1",

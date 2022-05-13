@@ -42,6 +42,37 @@ describe('Realm', () => {
           model: 'CRV',
         });
       });
+
+      describe('', () => {
+        const DeeplyNestedType = t.type({
+          foo: t.type({ bar: t.type({ baz: t.string, qux: t.string }) }),
+        });
+
+        it('works', () => {
+          realm.define(DeeplyNestedType, {
+            manifest: () => ({
+              foo: {
+                bar: {
+                  baz: 'hey',
+                  qux: 'there',
+                },
+              },
+            }),
+          });
+
+          const manifested = realm.manifest(DeeplyNestedType, {
+            foo: {
+              bar: {
+                baz: 'hello',
+              },
+            },
+          });
+
+          expect(manifested).toEqual({
+            foo: { bar: { baz: 'hello', qux: 'there' } },
+          });
+        });
+      });
     });
 
     describe('for an entity hierarchy', () => {

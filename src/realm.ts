@@ -1,5 +1,6 @@
 import { faker } from '@faker-js/faker';
 import * as t from 'io-ts';
+import { PartialDeep } from 'type-fest';
 import { RealmStorage } from './realm-storage';
 import { isMappedRef, ManifestedRef, MappedRef } from './ref';
 import { Define, EntityC, Manifest, Persist } from './types';
@@ -22,13 +23,13 @@ export class Realm {
     this.storage.clear();
   }
 
-  readonly manifest: Manifest = (Entity, overrides = {}) => {
+  readonly manifest: Manifest = (Entity, overrides = {} as any) => {
     const { manifestedEntity } = this.manifestWithRefs(Entity, overrides);
 
     return manifestedEntity;
   };
 
-  readonly persist: Persist = async (Entity, overrides = {}) => {
+  readonly persist: Persist = async (Entity, overrides = {} as any) => {
     const persister = this.storage.findPersister(Entity.name);
 
     const { manifestedEntity, refs } = this.manifestWithRefs(Entity, overrides);
@@ -42,7 +43,7 @@ export class Realm {
 
   private manifestWithRefs<C extends EntityC>(
     Entity: C,
-    overrides: Partial<t.TypeOf<C>>
+    overrides: PartialDeep<t.TypeOf<C>>
   ) {
     const manifester = this.storage.findManifester(Entity.name);
 
@@ -77,7 +78,7 @@ export class Realm {
     };
 
     for (const [key, value] of Object.entries(manifestedEntity)) {
-      if (key in overrides) {
+      if (key in (overrides as {})) {
         continue;
       }
 
@@ -94,7 +95,10 @@ export class Realm {
   private manifestRef<C extends EntityC>(
     ref: MappedRef<C, any>
   ): [ManifestedRef<C, any>, ...ManifestedRef<any, any>[]] {
-    const { manifestedEntity, refs } = this.manifestWithRefs(ref.Entity, {});
+    const { manifestedEntity, refs } = this.manifestWithRefs(
+      ref.Entity,
+      {} as any
+    );
 
     return [
       new ManifestedRef(
