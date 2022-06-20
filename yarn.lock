@@ -293,10 +293,10 @@
   resolved "https://registry.yarnpkg.com/@bcoe/v8-coverage/-/v8-coverage-0.2.3.tgz#75a2e8b51cb758a7553d6804a5932d7aace75c39"
   integrity sha512-0hYQ8SB4Db5zvZB4axdMHGwEaQjkZzFjQiN9LVYvIFB2nSUHW9tYpxWriPrWDASIxiaXax83REcLxuSdnGPZtw==
 
-"@faker-js/faker@6.0.0-alpha.7":
-  version "6.0.0-alpha.7"
-  resolved "https://registry.yarnpkg.com/@faker-js/faker/-/faker-6.0.0-alpha.7.tgz#d4383b10c5cd35ec02fafd1bc472b2f85c306cf5"
-  integrity sha512-T2nYE8+EfzfkRMLMSm7UvgC7fZ2KkKEyCMeyPVS0q2cuvENbt1SjWyu0bOJ0JqBbTs1g+gYMWMFMXspWlzNVmQ==
+"@faker-js/faker@7.2.0":
+  version "7.2.0"
+  resolved "https://registry.yarnpkg.com/@faker-js/faker/-/faker-7.2.0.tgz#c5fe4c34f3a3664ac64fe1a21bac2004ea5faa22"
+  integrity sha512-dzjQ0LFT+bPLWg0yyV3MpxaLJp/+VW4a0SnjNSWJ4YpJ928LXDOZAN+kB2/JPPisI3Ra0w2BxbD4M9J7o0jcpw==
 
 "@istanbuljs/load-nyc-config@^1.0.0":
   version "1.1.0"
