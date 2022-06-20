@@ -7,6 +7,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.8.0] - 2022-06-20
+
+### Changed
+
+- Updated `@faker-js/faker` to v7.2.0 ([@vcapretz](https://github.com/vcapretz) in [#5](https://github.com/maxdeviant/thaumaturge/pull/5))
+
 ## [0.7.0] - 2022-04-19
 
 ### Changed
@@ -80,7 +86,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - Initial release
 
-[unreleased]: https://github.com/maxdeviant/thaumaturge/compare/v0.7.0...HEAD
+[unreleased]: https://github.com/maxdeviant/thaumaturge/compare/v0.8.0...HEAD
+[0.8.0]: https://github.com/maxdeviant/thaumaturge/compare/v0.7.0...v0.8.0
 [0.7.0]: https://github.com/maxdeviant/thaumaturge/compare/v0.6.0...v0.7.0
 [0.6.0]: https://github.com/maxdeviant/thaumaturge/compare/v0.5.0...v0.6.0
 [0.5.0]: https://github.com/maxdeviant/thaumaturge/compare/v0.4.3...v0.5.0
