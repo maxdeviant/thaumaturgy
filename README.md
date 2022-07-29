@@ -1,6 +1,7 @@
 # Thaumaturge
 
-[![npm](https://img.shields.io/npm/v/thaumaturge.svg?maxAge=3600&style=flat-square)](https://www.npmjs.com/package/thaumaturge)
+[![npm](https://img.shields.io/npm/v/thaumaturge.svg?maxAge=3600)](https://www.npmjs.com/package/thaumaturge)
+[![CI](https://github.com/maxdeviant/thaumaturge/actions/workflows/ci.yml/badge.svg?branch=master)](https://github.com/maxdeviant/thaumaturge/actions/workflows/ci.yml)
 
 Thaumaturge is a fixtures and seeding library powered by `io-ts`.
 
