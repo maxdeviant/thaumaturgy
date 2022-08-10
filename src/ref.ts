@@ -1,6 +1,15 @@
 import * as t from 'io-ts';
 import { EntityC } from './types';
 
+/**
+ * A reference to another entity.
+ *
+ * ### Examples
+ *
+ * ```
+ * Ref.to(User).through(user => user.id);
+ * ```
+ */
 export class Ref<C extends EntityC> {
   static to<C extends EntityC>(Entity: C) {
     return new Ref(Entity);

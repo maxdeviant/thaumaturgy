@@ -5,12 +5,21 @@ export type EntityName = string;
 
 export type EntityC = t.Any;
 
+/**
+ * The options passed to a `Manifester`.
+ */
 export interface ManifesterOptions {
   faker: Faker;
 }
 
+/**
+ * A manifester for an entity of type `T`.
+ */
 export type Manifester<T> = (options: ManifesterOptions) => T;
 
+/**
+ * A persister for an entity of type `T`.
+ */
 export type Persister<T> = (entity: T) => Promise<T>;
 
 export interface DefineOptions<T> {

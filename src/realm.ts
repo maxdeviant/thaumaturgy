@@ -4,9 +4,17 @@ import { RealmStorage } from './realm-storage';
 import { isMappedRef, ManifestedRef, MappedRef } from './ref';
 import { Define, EntityC, Manifest, Persist } from './types';
 
+/**
+ * A realm is an isolated environment that entities may be registered with.
+ *
+ * Entity names must be unique within a realm.
+ */
 export class Realm {
   private readonly storage = new RealmStorage();
 
+  /**
+   * Defines an entity in the realm using the specified manifester and persister.
+   */
   readonly define: Define = (
     Entity,
     { manifest: manifester, persist: persister }
@@ -18,6 +26,9 @@ export class Realm {
     }
   };
 
+  /**
+   * Clears all of the entities within the realm.
+   */
   clear() {
     this.storage.clear();
   }
