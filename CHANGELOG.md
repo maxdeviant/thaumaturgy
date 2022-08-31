@@ -7,6 +7,15 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Added
+
+- Added `uuid` to `ManifesterOptions`
+- Added `sequences` to `ManifesterOptions`
+
+### Removed
+
+- Removed `faker` from `ManifesterOptions`
+
 ## [0.8.0] - 2022-06-20
 
 ### Changed
