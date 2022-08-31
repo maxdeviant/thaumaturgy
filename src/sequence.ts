@@ -1,10 +1,12 @@
 import { pipe } from 'fp-ts/function';
 import * as NEA from 'fp-ts/NonEmptyArray';
 
+export type SequenceProducer<T> = (n: number) => T;
+
 export class Sequence<T> {
   private counter = 1;
 
-  constructor(private readonly produce: (n: number) => T) {}
+  constructor(private readonly produce: SequenceProducer<T>) {}
 
   /**
    * Returns the next item in the sequence.

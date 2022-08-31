@@ -1,5 +1,5 @@
 import * as t from 'io-ts';
-import { Sequence } from './sequence';
+import { Sequence, SequenceProducer } from './sequence';
 
 export type EntityName = string;
 
@@ -26,12 +26,16 @@ export type Manifester<T, TSequences> = (
 export type Persister<T> = (entity: T) => Promise<T>;
 
 export interface Sequences {
-  [name: string]: Sequence<unknown>;
+  [name: string]: SequenceProducer<unknown>;
 }
+
+export type Mapped<T extends Sequences> = {
+  [K in keyof T]: Sequence<ReturnType<T[K]>>;
+};
 
 export interface DefineOptions<T, TSequences extends Sequences> {
   sequences?: TSequences;
-  manifest: Manifester<T, TSequences>;
+  manifest: Manifester<T, Mapped<TSequences>>;
   persist?: Persister<T>;
 }
 

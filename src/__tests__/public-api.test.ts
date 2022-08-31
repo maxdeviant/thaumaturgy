@@ -12,8 +12,8 @@ describe('Public API', () => {
 
     define(Movie, {
       sequences: {
-        movies: new Sequence(n => `Movie ${n}` as const),
-        years: new Sequence(n => 2022 - n),
+        movies: n => `Movie ${n}` as const,
+        years: n => 2022 - n,
       },
       manifest: ({ sequences }) => ({
         title: sequences.movies.next(),
