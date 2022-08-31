@@ -35,14 +35,14 @@ const Movie = t.strict({
 });
 
 define(Movie, {
-  manifest: ({ sequences }) => ({
-    title: sequences.titles.next(),
-    year: sequences.years.next(),
-  }),
   sequences: {
     titles: new Sequence(n => `Movie ${n}` as const),
     years: new Sequence(n => 2022 - n),
   },
+  manifest: ({ sequences }) => ({
+    title: sequences.titles.next(),
+    year: sequences.years.next(),
+  }),
 });
 
 const movie = manifest(Movie);
