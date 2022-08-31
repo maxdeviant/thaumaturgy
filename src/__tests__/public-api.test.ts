@@ -12,7 +12,7 @@ describe('Public API', () => {
 
     define(Movie, {
       sequences: {
-        movies: new Sequence(n => `Movie ${n}`),
+        movies: new Sequence(n => `Movie ${n}` as const),
         years: new Sequence(n => 2022 - n),
       },
       manifest: ({ sequences }) => ({
@@ -41,7 +41,7 @@ describe('Public API', () => {
         tags: sequences.tags.take(3),
       }),
       sequences: {
-        tags: new Sequence(n => `Tag ${n}`),
+        tags: new Sequence(n => `Tag ${n}` as const),
       },
     });
 
