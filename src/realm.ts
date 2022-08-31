@@ -1,4 +1,5 @@
 import * as t from 'io-ts';
+import { v4 as uuidV4 } from 'uuid';
 import { RealmStorage } from './realm-storage';
 import { isMappedRef, ManifestedRef, MappedRef } from './ref';
 import { Define, EntityC, Manifest, Persist } from './types';
@@ -57,15 +58,7 @@ export class Realm {
     const manifester = this.storage.findManifester(Entity.name);
 
     const manifestedEntity = manifester({
-      uuid: () => {
-        const RFC4122_TEMPLATE = 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx';
-        const replacePlaceholders = (placeholder: string) => {
-          const random = Math.floor(Math.random() * 15);
-          const value = placeholder === 'x' ? random : (random & 0x3) | 0x8;
-          return value.toString(16);
-        };
-        return RFC4122_TEMPLATE.replace(/[xy]/g, replacePlaceholders);
-      },
+      uuid: () => uuidV4(),
     });
 
     const refs: ManifestedRef<any, any>[] = [];
