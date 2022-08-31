@@ -11,9 +11,9 @@ describe('Public API', () => {
     });
 
     define(Movie, {
-      manifest: ({ faker }) => ({
-        title: faker.random.words(),
-        year: faker.date.past(10).getFullYear(),
+      manifest: ({ uuid }) => ({
+        title: uuid(),
+        year: 2020,
       }),
     });
 
@@ -32,9 +32,9 @@ describe('Public API', () => {
     });
 
     define(Post, {
-      manifest: ({ faker }) => ({
-        title: faker.random.words(),
-        tags: [faker.random.word(), faker.random.word(), faker.random.word()],
+      manifest: ({ uuid }) => ({
+        title: uuid(),
+        tags: [uuid(), uuid(), uuid()],
       }),
     });
 
@@ -59,17 +59,17 @@ describe('Public API', () => {
     });
 
     define(Author, {
-      manifest: ({ faker }) => ({
-        id: faker.datatype.uuid(),
-        name: faker.name.findName(),
+      manifest: ({ uuid }) => ({
+        id: uuid(),
+        name: uuid(),
       }),
     });
 
     define(Book, {
-      manifest: ({ faker }) => ({
-        id: faker.datatype.uuid(),
+      manifest: ({ uuid }) => ({
+        id: uuid(),
         authorId: Ref.to(Author).through(author => author.id),
-        title: faker.random.words(),
+        title: uuid(),
       }),
     });
 

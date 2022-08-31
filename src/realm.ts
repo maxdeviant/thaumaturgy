@@ -1,4 +1,3 @@
-import { faker } from '@faker-js/faker';
 import * as t from 'io-ts';
 import { RealmStorage } from './realm-storage';
 import { isMappedRef, ManifestedRef, MappedRef } from './ref';
@@ -57,7 +56,17 @@ export class Realm {
   ) {
     const manifester = this.storage.findManifester(Entity.name);
 
-    const manifestedEntity = manifester({ faker });
+    const manifestedEntity = manifester({
+      uuid: () => {
+        const RFC4122_TEMPLATE = 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx';
+        const replacePlaceholders = (placeholder: string) => {
+          const random = Math.floor(Math.random() * 15);
+          const value = placeholder === 'x' ? random : (random & 0x3) | 0x8;
+          return value.toString(16);
+        };
+        return RFC4122_TEMPLATE.replace(/[xy]/g, replacePlaceholders);
+      },
+    });
 
     const refs: ManifestedRef<any, any>[] = [];
 

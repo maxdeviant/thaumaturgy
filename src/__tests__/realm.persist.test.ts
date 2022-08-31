@@ -212,9 +212,9 @@ describe('Realm', () => {
         const realm = new Realm();
 
         realm.define(Author, {
-          manifest: ({ faker }) => ({
-            id: faker.datatype.uuid(),
-            name: faker.name.findName(),
+          manifest: ({ uuid }) => ({
+            id: uuid(),
+            name: uuid(),
           }),
           persist: async author => {
             await db.run(
@@ -228,10 +228,10 @@ describe('Realm', () => {
         });
 
         realm.define(Post, {
-          manifest: ({ faker }) => ({
-            id: faker.datatype.uuid(),
+          manifest: ({ uuid }) => ({
+            id: uuid(),
             authorId: Ref.to(Author).through(author => author.id),
-            title: faker.random.words(),
+            title: uuid(),
           }),
           persist: async post => {
             await db.run(
@@ -246,10 +246,10 @@ describe('Realm', () => {
         });
 
         realm.define(Comment, {
-          manifest: ({ faker }) => ({
-            id: faker.datatype.uuid(),
+          manifest: ({ uuid }) => ({
+            id: uuid(),
             postId: Ref.to(Post).through(post => post.id),
-            username: faker.internet.userName(),
+            username: uuid(),
           }),
           persist: async comment => {
             await db.run(

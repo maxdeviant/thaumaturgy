@@ -1,4 +1,3 @@
-import { Faker } from '@faker-js/faker';
 import * as t from 'io-ts';
 
 export type EntityName = string;
@@ -9,7 +8,7 @@ export type EntityC = t.Any;
  * The options passed to a `Manifester`.
  */
 export interface ManifesterOptions {
-  faker: Faker;
+  uuid: () => string;
 }
 
 /**

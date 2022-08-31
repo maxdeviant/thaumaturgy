@@ -1,4 +1,3 @@
-import { faker } from '@faker-js/faker';
 import * as t from 'io-ts';
 import { Realm } from '../realm';
 
@@ -27,22 +26,22 @@ describe('Realm', () => {
         expect(manifester).toHaveBeenCalledTimes(1);
       });
 
-      it('passes a Faker instance to the manifester', () => {
-        const realm = new Realm();
+      // it('passes a Faker instance to the manifester', () => {
+      //   const realm = new Realm();
 
-        const manifester = jest.fn<Movie, []>(() => ({
-          title: 'Pulp Fiction',
-          year: 1994 as t.Int,
-        }));
+      //   const manifester = jest.fn<Movie, []>(() => ({
+      //     title: 'Pulp Fiction',
+      //     year: 1994 as t.Int,
+      //   }));
 
-        realm.define(Movie, { manifest: manifester });
+      //   realm.define(Movie, { manifest: manifester });
 
-        realm.manifest(Movie);
+      //   realm.manifest(Movie);
 
-        expect(manifester).toHaveBeenCalledWith(
-          expect.objectContaining({ faker })
-        );
-      });
+      //   expect(manifester).toHaveBeenCalledWith(
+      //     expect.objectContaining({ faker })
+      //   );
+      // });
     });
 
     describe('when `persist` is invoked', () => {
