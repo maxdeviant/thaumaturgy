@@ -20,7 +20,7 @@ describe('Ref', () => {
 
       const authorManifester = jest.fn<
         t.TypeOf<typeof Author>,
-        [ManifesterOptions]
+        [ManifesterOptions<unknown>]
       >(({ uuid }) => ({ id: uuid() }));
 
       realm.define(Author, {
@@ -56,7 +56,7 @@ describe('Ref', () => {
 
         const authorManifester = jest.fn<
           t.TypeOf<typeof Author>,
-          [ManifesterOptions]
+          [ManifesterOptions<unknown>]
         >(({ uuid }) => ({ id: uuid() }));
 
         realm.define(Author, {
@@ -91,7 +91,7 @@ describe('Ref', () => {
 
         const authorManifester = jest.fn<
           t.TypeOf<typeof Author>,
-          [ManifesterOptions]
+          [ManifesterOptions<unknown>]
         >(({ uuid }) => ({ id: uuid() }));
 
         realm.define(Author, {
@@ -139,7 +139,7 @@ describe('Ref', () => {
 
       const authorManifester = jest.fn<
         t.TypeOf<typeof Author>,
-        [ManifesterOptions]
+        [ManifesterOptions<unknown>]
       >(({ uuid }) => ({ id: uuid() }));
 
       realm.define(Author, {

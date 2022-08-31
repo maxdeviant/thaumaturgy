@@ -1,7 +1,7 @@
 import * as t from 'io-ts';
 // Importing from the root barrel file intentionally to simulate what library
 // consumers will see.
-import { define, manifest, Ref } from '..';
+import { define, manifest, Ref, Sequence } from '..';
 
 describe('Public API', () => {
   it('works with a basic example', () => {
@@ -11,9 +11,13 @@ describe('Public API', () => {
     });
 
     define(Movie, {
-      manifest: ({ uuid }) => ({
-        title: uuid(),
-        year: 2020,
+      sequences: {
+        movies: new Sequence(n => `Movie ${n}`),
+        years: new Sequence(n => 2022 - n),
+      },
+      manifest: ({ sequences }) => ({
+        title: sequences.movies.next(),
+        year: sequences.years.next(),
       }),
     });
 
@@ -32,13 +36,18 @@ describe('Public API', () => {
     });
 
     define(Post, {
-      manifest: ({ uuid }) => ({
+      manifest: ({ uuid, sequences }) => ({
         title: uuid(),
-        tags: [uuid(), uuid(), uuid()],
+        tags: sequences.tags.take(3),
       }),
+      sequences: {
+        tags: new Sequence(n => `Tag ${n}`),
+      },
     });
 
     const post = manifest(Post);
+
+    console.log(post);
 
     expect(post).toEqual({
       title: expect.any(String),

@@ -4,6 +4,7 @@ import {
   PersisterAlreadyRegisteredError,
   PersisterNotFoundError,
 } from './errors';
+import { Sequence } from './sequence';
 import { EntityName, Manifester, Persister } from './types';
 
 /**
@@ -14,8 +15,12 @@ import { EntityName, Manifester, Persister } from './types';
  * @internal
  */
 export class RealmStorage {
-  private readonly manifesters = new Map<EntityName, Manifester<any>>();
+  private readonly manifesters = new Map<EntityName, Manifester<any, any>>();
   private readonly persisters = new Map<EntityName, Persister<any>>();
+  private readonly sequences = new Map<
+    EntityName,
+    Record<string, Sequence<any>>
+  >();
 
   /**
    * Registers a manifester under the specified entity name.
@@ -23,7 +28,7 @@ export class RealmStorage {
    * @param entityName The name of the entity to register the manifester under.
    * @param manifester The manifester to register.
    */
-  registerManifester(entityName: EntityName, manifester: Manifester<any>) {
+  registerManifester(entityName: EntityName, manifester: Manifester<any, any>) {
     if (this.manifesters.has(entityName)) {
       throw new ManifesterAlreadyRegisteredError(entityName);
     }
@@ -77,6 +82,17 @@ export class RealmStorage {
     }
 
     return persister;
+  }
+
+  registerSequences(
+    entityName: EntityName,
+    sequences: Record<string, Sequence<any>>
+  ) {
+    this.sequences.set(entityName, sequences);
+  }
+
+  findSequences(entityName: EntityName) {
+    return this.sequences.get(entityName);
   }
 
   /**
