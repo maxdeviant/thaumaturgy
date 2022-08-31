@@ -36,11 +36,12 @@ describe('Public API', () => {
     });
 
     define(Post, {
-      manifest: ({ uuid, sequences }) => ({
-        title: uuid(),
+      manifest: ({ sequences }) => ({
+        title: sequences.titles.next(),
         tags: sequences.tags.take(3),
       }),
       sequences: {
+        titles: new Sequence(n => `Post ${n}` as const),
         tags: new Sequence(n => `Tag ${n}` as const),
       },
     });
@@ -68,7 +69,7 @@ describe('Public API', () => {
     define(Author, {
       manifest: ({ uuid }) => ({
         id: uuid(),
-        name: uuid(),
+        name: 'J. R. R. Tolkien',
       }),
     });
 
@@ -76,7 +77,7 @@ describe('Public API', () => {
       manifest: ({ uuid }) => ({
         id: uuid(),
         authorId: Ref.to(Author).through(author => author.id),
-        title: uuid(),
+        title: 'The Lord of the Rings',
       }),
     });
 
