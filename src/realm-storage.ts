@@ -37,7 +37,7 @@ export class RealmStorage {
   }
 
   /**
-   * Returns the manifester registered under the specified entity name
+   * Returns the manifester registered under the specified entity name.
    *
    * Throws a `ManifesterNotFoundError` if there is no manifester registered
    * under the specified entity name.
@@ -57,7 +57,7 @@ export class RealmStorage {
    * Registers a persister under the specified entity name.
    *
    * @param entityName The name of the entity to register the persister under.
-   * @param persister The manifester to register.
+   * @param persister The persister to register.
    */
   registerPersister(entityName: EntityName, persister: Persister<any>) {
     if (this.persisters.has(entityName)) {
@@ -68,7 +68,7 @@ export class RealmStorage {
   }
 
   /**
-   * Returns the persister registered under the specified entity name
+   * Returns the persister registered under the specified entity name.
    *
    * Throws a `PersisterNotFoundError` if there is no persister registered
    * under the specified entity name.
@@ -84,6 +84,12 @@ export class RealmStorage {
     return persister;
   }
 
+  /**
+   * Registers a collection of sequences under the specified entity name.
+   *
+   * @param entityName The name of the entity to register the sequences under.
+   * @param sequences The sequences to register.
+   */
   registerSequences(
     entityName: EntityName,
     sequences: Record<string, Sequence<any>>
@@ -91,6 +97,14 @@ export class RealmStorage {
     this.sequences.set(entityName, sequences);
   }
 
+  /**
+   * Returns the sequences registered under the specified entity name.
+   *
+   * Returns `undefined` if there are no sequences registered under the specified
+   * entity name.
+   *
+   * @param entityName The name of the entity to find the sequences for.
+   */
   findSequences(entityName: EntityName) {
     return this.sequences.get(entityName);
   }
@@ -102,5 +116,6 @@ export class RealmStorage {
   clear() {
     this.manifesters.clear();
     this.persisters.clear();
+    this.sequences.clear();
   }
 }
