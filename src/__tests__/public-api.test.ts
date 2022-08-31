@@ -47,8 +47,6 @@ describe('Public API', () => {
 
     const post = manifest(Post);
 
-    console.log(post);
-
     expect(post).toEqual({
       title: expect.any(String),
       tags: [expect.any(String), expect.any(String), expect.any(String)],
