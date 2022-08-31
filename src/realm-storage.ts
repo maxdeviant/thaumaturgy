@@ -4,6 +4,7 @@ import {
   PersisterAlreadyRegisteredError,
   PersisterNotFoundError,
 } from './errors';
+import { Sequence } from './sequence';
 import { EntityName, Manifester, Persister } from './types';
 
 /**
@@ -14,8 +15,12 @@ import { EntityName, Manifester, Persister } from './types';
  * @internal
  */
 export class RealmStorage {
-  private readonly manifesters = new Map<EntityName, Manifester<any>>();
+  private readonly manifesters = new Map<EntityName, Manifester<any, any>>();
   private readonly persisters = new Map<EntityName, Persister<any>>();
+  private readonly sequences = new Map<
+    EntityName,
+    Record<string, Sequence<any>>
+  >();
 
   /**
    * Registers a manifester under the specified entity name.
@@ -23,7 +28,7 @@ export class RealmStorage {
    * @param entityName The name of the entity to register the manifester under.
    * @param manifester The manifester to register.
    */
-  registerManifester(entityName: EntityName, manifester: Manifester<any>) {
+  registerManifester(entityName: EntityName, manifester: Manifester<any, any>) {
     if (this.manifesters.has(entityName)) {
       throw new ManifesterAlreadyRegisteredError(entityName);
     }
@@ -32,7 +37,7 @@ export class RealmStorage {
   }
 
   /**
-   * Returns the manifester registered under the specified entity name
+   * Returns the manifester registered under the specified entity name.
    *
    * Throws a `ManifesterNotFoundError` if there is no manifester registered
    * under the specified entity name.
@@ -52,7 +57,7 @@ export class RealmStorage {
    * Registers a persister under the specified entity name.
    *
    * @param entityName The name of the entity to register the persister under.
-   * @param persister The manifester to register.
+   * @param persister The persister to register.
    */
   registerPersister(entityName: EntityName, persister: Persister<any>) {
     if (this.persisters.has(entityName)) {
@@ -63,7 +68,7 @@ export class RealmStorage {
   }
 
   /**
-   * Returns the persister registered under the specified entity name
+   * Returns the persister registered under the specified entity name.
    *
    * Throws a `PersisterNotFoundError` if there is no persister registered
    * under the specified entity name.
@@ -80,11 +85,37 @@ export class RealmStorage {
   }
 
   /**
+   * Registers a collection of sequences under the specified entity name.
+   *
+   * @param entityName The name of the entity to register the sequences under.
+   * @param sequences The sequences to register.
+   */
+  registerSequences(
+    entityName: EntityName,
+    sequences: Record<string, Sequence<any>>
+  ) {
+    this.sequences.set(entityName, sequences);
+  }
+
+  /**
+   * Returns the sequences registered under the specified entity name.
+   *
+   * Returns `undefined` if there are no sequences registered under the specified
+   * entity name.
+   *
+   * @param entityName The name of the entity to find the sequences for.
+   */
+  findSequences(entityName: EntityName) {
+    return this.sequences.get(entityName);
+  }
+
+  /**
    * Clears all manifesters and persisters registered with this `RealmStorage`
    * instance.
    */
   clear() {
     this.manifesters.clear();
     this.persisters.clear();
+    this.sequences.clear();
   }
 }

@@ -1,7 +1,7 @@
 import * as t from 'io-ts';
 // Importing from the root barrel file intentionally to simulate what library
 // consumers will see.
-import { define, manifest, Ref } from '..';
+import { define, manifest, Ref, Sequence } from '..';
 
 describe('Public API', () => {
   it('works with a basic example', () => {
@@ -11,9 +11,13 @@ describe('Public API', () => {
     });
 
     define(Movie, {
-      manifest: ({ faker }) => ({
-        title: faker.random.words(),
-        year: faker.date.past(10).getFullYear(),
+      sequences: {
+        movies: new Sequence(n => `Movie ${n}` as const),
+        years: new Sequence(n => 2022 - n),
+      },
+      manifest: ({ sequences }) => ({
+        title: sequences.movies.next(),
+        year: sequences.years.next(),
       }),
     });
 
@@ -32,10 +36,14 @@ describe('Public API', () => {
     });
 
     define(Post, {
-      manifest: ({ faker }) => ({
-        title: faker.random.words(),
-        tags: [faker.random.word(), faker.random.word(), faker.random.word()],
+      manifest: ({ sequences }) => ({
+        title: sequences.titles.next(),
+        tags: sequences.tags.take(3),
       }),
+      sequences: {
+        titles: new Sequence(n => `Post ${n}` as const),
+        tags: new Sequence(n => `Tag ${n}` as const),
+      },
     });
 
     const post = manifest(Post);
@@ -59,17 +67,17 @@ describe('Public API', () => {
     });
 
     define(Author, {
-      manifest: ({ faker }) => ({
-        id: faker.datatype.uuid(),
-        name: faker.name.findName(),
+      manifest: ({ uuid }) => ({
+        id: uuid(),
+        name: 'J. R. R. Tolkien',
       }),
     });
 
     define(Book, {
-      manifest: ({ faker }) => ({
-        id: faker.datatype.uuid(),
+      manifest: ({ uuid }) => ({
+        id: uuid(),
         authorId: Ref.to(Author).through(author => author.id),
-        title: faker.random.words(),
+        title: 'The Lord of the Rings',
       }),
     });
 

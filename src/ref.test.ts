@@ -20,16 +20,16 @@ describe('Ref', () => {
 
       const authorManifester = jest.fn<
         t.TypeOf<typeof Author>,
-        [ManifesterOptions]
-      >(({ faker }) => ({ id: faker.datatype.uuid() }));
+        [ManifesterOptions<unknown>]
+      >(({ uuid }) => ({ id: uuid() }));
 
       realm.define(Author, {
         manifest: authorManifester,
       });
 
       realm.define(Post, {
-        manifest: ({ faker }) => ({
-          id: faker.datatype.uuid(),
+        manifest: ({ uuid }) => ({
+          id: uuid(),
           authorId: O.some(Ref.to(Author).through(author => author.id)),
         }),
       });
@@ -56,16 +56,16 @@ describe('Ref', () => {
 
         const authorManifester = jest.fn<
           t.TypeOf<typeof Author>,
-          [ManifesterOptions]
-        >(({ faker }) => ({ id: faker.datatype.uuid() }));
+          [ManifesterOptions<unknown>]
+        >(({ uuid }) => ({ id: uuid() }));
 
         realm.define(Author, {
           manifest: authorManifester,
         });
 
         realm.define(Post, {
-          manifest: ({ faker }) => ({
-            id: faker.datatype.uuid(),
+          manifest: ({ uuid }) => ({
+            id: uuid(),
             authorId: E.left(Ref.to(Author).through(author => author.id)),
           }),
         });
@@ -91,16 +91,16 @@ describe('Ref', () => {
 
         const authorManifester = jest.fn<
           t.TypeOf<typeof Author>,
-          [ManifesterOptions]
-        >(({ faker }) => ({ id: faker.datatype.uuid() }));
+          [ManifesterOptions<unknown>]
+        >(({ uuid }) => ({ id: uuid() }));
 
         realm.define(Author, {
           manifest: authorManifester,
         });
 
         realm.define(Post, {
-          manifest: ({ faker }) => ({
-            id: faker.datatype.uuid(),
+          manifest: ({ uuid }) => ({
+            id: uuid(),
             authorId: E.right(Ref.to(Author).through(author => author.id)),
           }),
         });
@@ -139,16 +139,16 @@ describe('Ref', () => {
 
       const authorManifester = jest.fn<
         t.TypeOf<typeof Author>,
-        [ManifesterOptions]
-      >(({ faker }) => ({ id: faker.datatype.uuid() }));
+        [ManifesterOptions<unknown>]
+      >(({ uuid }) => ({ id: uuid() }));
 
       realm.define(Author, {
         manifest: authorManifester,
       });
 
       realm.define(Post, {
-        manifest: ({ faker }) => ({
-          id: faker.datatype.uuid(),
+        manifest: ({ uuid }) => ({
+          id: uuid(),
           a: {
             u: {
               t: {

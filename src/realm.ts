@@ -1,5 +1,5 @@
-import { faker } from '@faker-js/faker';
 import * as t from 'io-ts';
+import { v4 as uuidV4 } from 'uuid';
 import { RealmStorage } from './realm-storage';
 import { isMappedRef, ManifestedRef, MappedRef } from './ref';
 import { Define, EntityC, Manifest, Persist } from './types';
@@ -17,12 +17,16 @@ export class Realm {
    */
   readonly define: Define = (
     Entity,
-    { manifest: manifester, persist: persister }
+    { manifest: manifester, persist: persister, sequences }
   ) => {
     this.storage.registerManifester(Entity.name, manifester);
 
     if (typeof persister === 'function') {
       this.storage.registerPersister(Entity.name, persister);
+    }
+
+    if (sequences) {
+      this.storage.registerSequences(Entity.name, sequences);
     }
   };
 
@@ -56,8 +60,12 @@ export class Realm {
     overrides: Partial<t.TypeOf<C>>
   ) {
     const manifester = this.storage.findManifester(Entity.name);
+    const sequences = this.storage.findSequences(Entity.name);
 
-    const manifestedEntity = manifester({ faker });
+    const manifestedEntity = manifester({
+      uuid: () => uuidV4(),
+      sequences,
+    });
 
     const refs: ManifestedRef<any, any>[] = [];
 

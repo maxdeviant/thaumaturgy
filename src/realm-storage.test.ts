@@ -5,6 +5,7 @@ import {
   PersisterNotFoundError,
 } from './errors';
 import { RealmStorage } from './realm-storage';
+import { Sequence } from './sequence';
 
 describe('RealmStorage', () => {
   describe('registerManifester', () => {
@@ -134,6 +135,20 @@ describe('RealmStorage', () => {
       storage.clear();
 
       expect(() => storage.findPersister('User')).toThrow();
+    });
+
+    it('clears the registered sequences', () => {
+      const storage = new RealmStorage();
+
+      storage.registerSequences('User', {
+        firstNames: new Sequence(n => `John ${n}` as const),
+      });
+
+      expect(storage.findSequences('User')).toBeDefined();
+
+      storage.clear();
+
+      expect(storage.findSequences('User')).toBeUndefined();
     });
   });
 });

@@ -1,4 +1,3 @@
-import { faker } from '@faker-js/faker';
 import * as t from 'io-ts';
 import { Realm } from '../realm';
 
@@ -27,7 +26,7 @@ describe('Realm', () => {
         expect(manifester).toHaveBeenCalledTimes(1);
       });
 
-      it('passes a Faker instance to the manifester', () => {
+      it('passes a `uuid` function to the manifester', () => {
         const realm = new Realm();
 
         const manifester = jest.fn<Movie, []>(() => ({
@@ -40,7 +39,7 @@ describe('Realm', () => {
         realm.manifest(Movie);
 
         expect(manifester).toHaveBeenCalledWith(
-          expect.objectContaining({ faker })
+          expect.objectContaining({ uuid: expect.any(Function) })
         );
       });
     });

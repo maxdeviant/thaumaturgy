@@ -35,16 +35,20 @@ const Movie = t.strict({
 });
 
 define(Movie, {
-  manifest: ({ faker }) => ({
-    title: faker.random.words(),
-    year: faker.date.past(10).getFullYear(),
+  sequences: {
+    titles: new Sequence(n => `Movie ${n}` as const),
+    years: new Sequence(n => 2022 - n),
+  },
+  manifest: ({ sequences }) => ({
+    title: sequences.titles.next(),
+    year: sequences.years.next(),
   }),
 });
 
 const movie = manifest(Movie);
 
 console.log(movie);
-// > { title: 'efficient turn-key', year: 2021 }
+// > { title: 'Movie 1', year: 2021 }
 ```
 
 ### Entity Hierarchies
@@ -65,17 +69,17 @@ const Book = t.type({
 });
 
 define(Author, {
-  manifest: ({ faker }) => ({
-    id: faker.datatype.uuid(),
-    name: faker.name.findName(),
+  manifest: ({ uuid }) => ({
+    id: uuid(),
+    name: 'J. R. R. Tolkien',
   }),
 });
 
 define(Book, {
-  manifest: ({ faker }) => ({
-    id: faker.datatype.uuid(),
+  manifest: ({ uuid }) => ({
+    id: uuid(),
     authorId: Ref.to(Author).through(author => author.id),
-    title: faker.random.words(),
+    title: 'The Lord of the Rings',
   }),
 });
 
@@ -85,6 +89,6 @@ console.log(book);
 // > {
 //     id: '1ab4790a-9911-4e20-9006-b12e6b60dfe6',
 //     authorId: 'c6a1f6e0-6845-4675-b570-87024446a371',
-//     title: 'Tuna Central'
+//     title: 'The Lord of the Rings'
 //   }
 ```
