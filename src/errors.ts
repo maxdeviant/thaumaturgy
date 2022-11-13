@@ -1,7 +1,7 @@
 import { EntityName } from './types';
 
 /**
- * An error thrown when an entity as not found.
+ * An error thrown when an entity was not found.
  */
 export class EntityNotFoundError extends Error {
   constructor(entityName: EntityName) {
