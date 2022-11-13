@@ -68,7 +68,7 @@ export class Realm {
 
     const lastBatch = topologicallyBatchedEntities.pop();
     if (!lastBatch) {
-      throw new Error('?');
+      throw new Error('No leaves found to persist.');
     }
 
     const persistedEntities: any[] = [];
