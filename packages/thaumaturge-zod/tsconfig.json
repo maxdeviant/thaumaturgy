@@ -14,7 +14,8 @@
     "outDir": "lib",
     "strict": true,
     "stripInternal": true,
-    "target": "ES6"
+    "target": "ES6",
+    "lib": ["ES2019"]
   },
   "include": ["src"]
 }

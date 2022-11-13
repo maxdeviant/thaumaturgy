@@ -1,4 +1,3 @@
-import { Sequence } from 'thaumaturge';
 import {
   EntityAlreadyRegisteredError,
   ManifesterAlreadyRegisteredError,
@@ -6,6 +5,7 @@ import {
   PersisterAlreadyRegisteredError,
   PersisterNotFoundError,
 } from './errors';
+import { Sequence } from 'thaumaturge';
 import { EntityC, EntityName, Manifester, Persister } from './types';
 
 /**
@@ -36,9 +36,7 @@ export class RealmStorage {
    *
    * @param Entity The entity to register.
    */
-  registerEntity(Entity: EntityC) {
-    const entityName = Entity.name;
-
+  registerEntity(entityName: string, Entity: EntityC) {
     if (this.entities.has(entityName)) {
       throw new EntityAlreadyRegisteredError(entityName);
     }

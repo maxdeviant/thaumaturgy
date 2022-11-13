@@ -1,9 +1,9 @@
-import * as t from 'io-ts';
+import { z } from 'zod';
 import { Sequence } from 'thaumaturge';
 
 export type EntityName = string;
 
-export type EntityC = t.Any;
+export type EntityC = z.ZodTypeAny;
 
 /**
  * The options passed to a `Manifester`.
@@ -37,17 +37,17 @@ export interface DefineOptions<T, TSequences extends Sequences> {
 
 export type Define = <C extends EntityC, TSequences extends Sequences>(
   Entity: C,
-  options: DefineOptions<t.TypeOf<C>, TSequences>
+  options: DefineOptions<z.TypeOf<C>, TSequences>
 ) => void;
 
 export type Manifest = <C extends EntityC>(
   Entity: C,
-  overrides?: Partial<t.TypeOf<C>>
-) => t.TypeOf<C>;
+  overrides?: Partial<z.TypeOf<C>>
+) => z.TypeOf<C>;
 
 export type Persist = <C extends EntityC>(
   Entity: C,
-  overrides?: Partial<t.TypeOf<C>>
-) => Promise<t.TypeOf<C>>;
+  overrides?: Partial<z.TypeOf<C>>
+) => Promise<z.TypeOf<C>>;
 
 export type PersistLeaves = () => Promise<unknown[]>;

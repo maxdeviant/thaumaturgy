@@ -1,7 +1,8 @@
 import * as t from 'io-ts';
+import { Sequence } from 'thaumaturge';
 // Importing from the root barrel file intentionally to simulate what library
 // consumers will see.
-import { define, manifest, Ref, Sequence } from '..';
+import { define, manifest, Ref } from '..';
 
 describe('Public API', () => {
   it('works with a basic example', () => {

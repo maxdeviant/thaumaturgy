@@ -2,9 +2,9 @@ import * as t from 'io-ts';
 import assert from 'node:assert';
 import { open } from 'sqlite';
 import sqlite3 from 'sqlite3';
+import { Sequence } from 'thaumaturge';
 import { Realm } from '../realm';
 import { Ref } from '../ref';
-import { Sequence } from '../sequence';
 
 describe('Realm', () => {
   describe('persistLeaves', () => {
