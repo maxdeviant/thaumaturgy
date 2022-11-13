@@ -34,8 +34,7 @@
     "io-ts": "2.x"
   },
   "dependencies": {
-    "thaumaturge": "workspace:*",
-    "uuid": "8.3.2"
+    "thaumaturge": "workspace:*"
   },
   "devDependencies": {
     "@types/jest": "28.1.6",
