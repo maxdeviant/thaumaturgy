@@ -1,29 +1,25 @@
-import * as t from 'io-ts';
 import { ManifestedRef } from './ref';
-import { EntityC, EntityName } from './types';
+import { Entity, EntityName } from './types';
 
-export type ManifestWithRefs = <C extends EntityC>(
-  Entity: C,
-  overrides: Partial<t.TypeOf<C>>
+export type ManifestWithRefs = (
+  Entity: Entity,
+  overrides: Partial<any>
 ) => {
   manifestedEntity: any;
-  refs: ManifestedRef<C, any>[];
+  refs: ManifestedRef<any, any>[];
 };
 
-export class EntityGraphNode<C extends EntityC> {
+export class EntityGraphNode {
   readonly refs: EntityName[] = [];
 
-  constructor(readonly Entity: C) {}
+  constructor(readonly Entity: Entity) {}
 }
 
 export class EntityGraph {
-  private readonly nodes: EntityGraphNode<EntityC>[] = [];
-  private readonly nodesByName = new Map<
-    EntityName,
-    EntityGraphNode<EntityC>
-  >();
+  private readonly nodes: EntityGraphNode[] = [];
+  private readonly nodesByName = new Map<EntityName, EntityGraphNode>();
 
-  constructor(entities: EntityC[], manifestWithRefs: ManifestWithRefs) {
+  constructor(entities: Entity[], manifestWithRefs: ManifestWithRefs) {
     for (const Entity of entities) {
       const node = new EntityGraphNode(Entity);
       this.nodes.push(node);

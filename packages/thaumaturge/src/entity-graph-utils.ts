@@ -1,10 +1,10 @@
 import { EntityGraph, ManifestWithRefs } from './entity-graph';
-import { EntityC, EntityName } from './types';
+import { Entity, EntityName } from './types';
 
-export type Batch = EntityC[];
+export type Batch = Entity[];
 
 export const topologicallyBatchEntities = (
-  entitiesToBatch: EntityC[],
+  entitiesToBatch: Entity[],
   manifestWithRefs: ManifestWithRefs
 ) => {
   const entities = entitiesToBatch.slice();
