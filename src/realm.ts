@@ -57,10 +57,13 @@ export class Realm {
     return persister(manifestedEntity);
   };
 
-  readonly persistAll = async () => {
-    const topologicallyBatchedEntities = topologicallyBatchEntities(
-      this.storage.allEntities,
-      (Entity, overrides) => this.manifestWithRefs(Entity, overrides)
+  readonly persistLeaves = async () => {
+    const topologicallyBatchedEntities = this.storage.withSnapshottedSequences(
+      () =>
+        topologicallyBatchEntities(
+          this.storage.allEntities,
+          (Entity, overrides) => this.manifestWithRefs(Entity, overrides)
+        )
     );
 
     const lastBatch = topologicallyBatchedEntities.pop();
@@ -68,9 +71,13 @@ export class Realm {
       throw new Error('?');
     }
 
+    const persistedEntities: any[] = [];
+
     for (const Entity of lastBatch) {
-      await this.persist(Entity);
+      persistedEntities.push(await this.persist(Entity));
     }
+
+    return persistedEntities;
   };
 
   private manifestWithRefs<C extends EntityC>(

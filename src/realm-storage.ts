@@ -133,11 +133,56 @@ export class RealmStorage {
     return this.sequences.get(entityName);
   }
 
+  snapshotSequences() {
+    const counterSnapshots = new Map<EntityName, Map<string, number>>();
+
+    for (const [entityName, sequences] of this.sequences) {
+      const sequenceSnapshots = new Map<string, number>();
+
+      for (const [sequenceName, sequence] of Object.entries(sequences)) {
+        sequenceSnapshots.set(sequenceName, sequence['counter']);
+      }
+
+      counterSnapshots.set(entityName, sequenceSnapshots);
+    }
+
+    return counterSnapshots;
+  }
+
+  restoreSequences(snapshot: Map<EntityName, Map<string, number>>) {
+    for (const [entityName, sequenceSnapshots] of snapshot) {
+      const sequences = this.sequences.get(entityName);
+      if (!sequences) {
+        continue;
+      }
+
+      for (const [sequenceName, counter] of sequenceSnapshots) {
+        const sequence = sequences[sequenceName];
+        if (!sequence) {
+          continue;
+        }
+
+        sequence['counter'] = counter;
+      }
+    }
+  }
+
+  withSnapshottedSequences<T>(thunk: () => T) {
+    const snapshot = this.snapshotSequences();
+
+    const result = thunk();
+
+    this.restoreSequences(snapshot);
+
+    return result;
+  }
+
   /**
    * Clears all manifesters and persisters registered with this `RealmStorage`
    * instance.
    */
   clear() {
+    this.entities.clear();
     this.manifesters.clear();
     this.persisters.clear();
     this.sequences.clear();

@@ -424,35 +424,36 @@ describe('Realm', () => {
       it('persists an instance of each entity in the hierarchy', async () => {
         const { db, realm } = await performSetup();
 
-        const comment = await realm.persistAll();
-
-        const commentsInDatabase = await db.all('select * from comment');
-
-        // expect(commentsInDatabase).toEqual([
-        //   {
-        //     id: comment.id,
-        //     post_id: comment.postId,
-        //     username: comment.username,
-        //   },
-        // ]);
-
-        const postsInDatabase = await db.all('select * from post');
-
-        // expect(postsInDatabase).toEqual([
-        //   {
-        //     id: comment.postId,
-        //     author_id: expect.any(String),
-        //     title: expect.any(String),
-        //   },
-        // ]);
+        const leaves = await realm.persistLeaves();
 
         const authorsInDatabase = await db.all('select * from author');
 
-        console.log({ commentsInDatabase, postsInDatabase, authorsInDatabase });
+        expect(authorsInDatabase).toEqual([
+          {
+            id: expect.any(String),
+            name: 'Author 1',
+          },
+        ]);
 
-        // expect(authorsInDatabase).toEqual([
-        //   { id: postsInDatabase[0].author_id, name: expect.any(String) },
-        // ]);
+        const postsInDatabase = await db.all('select * from post');
+
+        expect(postsInDatabase).toEqual([
+          {
+            id: expect.any(String),
+            author_id: authorsInDatabase[0].id,
+            title: 'Post 1',
+          },
+        ]);
+
+        const commentsInDatabase = await db.all('select * from comment');
+
+        expect(commentsInDatabase).toEqual([
+          {
+            id: expect.any(String),
+            post_id: postsInDatabase[0].id,
+            username: 'user1',
+          },
+        ]);
       });
     });
   });
