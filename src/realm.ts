@@ -39,12 +39,24 @@ export class Realm {
     this.storage.clear();
   }
 
+  /**
+   * Manifests an instance of the specified entity.
+   *
+   * @param Entity The entity to manifest.
+   * @param overrides The overrides to pass to the manifester.
+   */
   readonly manifest: Manifest = (Entity, overrides = {}) => {
     const { manifestedEntity } = this.manifestWithRefs(Entity, overrides);
 
     return manifestedEntity;
   };
 
+  /**
+   * Persists an instance of the specified entity.
+   *
+   * @param Entity The entity to persist.
+   * @param overrides The overrides to pass to the persister.
+   */
   readonly persist: Persist = async (Entity, overrides = {}) => {
     const persister = this.storage.findPersister(Entity.name);
 
