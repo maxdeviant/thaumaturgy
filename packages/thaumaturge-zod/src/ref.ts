@@ -1,4 +1,6 @@
-import { z } from 'zod'
+import { MappedRef } from 'thaumaturge';
+import { z } from 'zod';
+import { extractEntityName } from './entity-name';
 import { EntityC } from './types';
 
 /**
@@ -18,33 +20,9 @@ export class Ref<C extends EntityC> {
   private constructor(private readonly Entity: C) {}
 
   through<U>(mapping: (entity: z.TypeOf<C>) => U) {
-    return new MappedRef(this.Entity, mapping) as unknown as U;
+    return new MappedRef(
+      { C: this.Entity, name: extractEntityName(this.Entity) },
+      mapping
+    ) as unknown as U;
   }
-}
-
-/**
- * @internal
- */
-export const isMappedRef = (value: unknown): value is MappedRef<any, any> =>
-  value instanceof MappedRef;
-
-/**
- * @internal
- */
-export class MappedRef<C extends EntityC, U> {
-  constructor(
-    readonly Entity: C,
-    readonly mapping: (entity: z.TypeOf<C>) => U
-  ) {}
-}
-
-/**
- * @internal
- */
-export class ManifestedRef<C extends EntityC, U> {
-  constructor(
-    readonly Entity: C,
-    readonly entity: z.TypeOf<C>,
-    readonly mappedValue: U
-  ) {}
 }
