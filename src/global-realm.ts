@@ -7,6 +7,6 @@ import { Realm } from './realm';
  */
 const globalRealm = new Realm();
 
-const { define, manifest, persist } = globalRealm;
+const { define, manifest, persist, persistLeaves } = globalRealm;
 
-export { define, manifest, persist };
+export { define, manifest, persist, persistLeaves };
