@@ -426,7 +426,7 @@ describe('Realm', () => {
 
         const comment = await realm.persistAll();
 
-        // const commentsInDatabase = await db.all('select * from comment');
+        const commentsInDatabase = await db.all('select * from comment');
 
         // expect(commentsInDatabase).toEqual([
         //   {
@@ -436,7 +436,7 @@ describe('Realm', () => {
         //   },
         // ]);
 
-        // const postsInDatabase = await db.all('select * from post');
+        const postsInDatabase = await db.all('select * from post');
 
         // expect(postsInDatabase).toEqual([
         //   {
@@ -446,12 +446,14 @@ describe('Realm', () => {
         //   },
         // ]);
 
-        // const authorsInDatabase = await db.all('select * from author');
+        const authorsInDatabase = await db.all('select * from author');
+
+        console.log({ commentsInDatabase, postsInDatabase, authorsInDatabase });
 
         // expect(authorsInDatabase).toEqual([
         //   { id: postsInDatabase[0].author_id, name: expect.any(String) },
         // ]);
       });
     });
-  })
+  });
 });

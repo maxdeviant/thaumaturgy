@@ -1,5 +1,6 @@
 import * as t from 'io-ts';
 import { v4 as uuidV4 } from 'uuid';
+import { topologicallyBatchEntities } from './entity-graph-utils';
 import { RealmStorage } from './realm-storage';
 import { isMappedRef, ManifestedRef, MappedRef } from './ref';
 import { Define, EntityC, Manifest, Persist } from './types';
@@ -57,10 +58,19 @@ export class Realm {
   };
 
   readonly persistAll = async () => {
-    this.storage.buildEntityGraph({
-      manifestWithRefs: (Entity, overrides) =>
-        this.manifestWithRefs(Entity, overrides),
-    });
+    const topologicallyBatchedEntities = topologicallyBatchEntities(
+      this.storage.allEntities,
+      (Entity, overrides) => this.manifestWithRefs(Entity, overrides)
+    );
+
+    const lastBatch = topologicallyBatchedEntities.pop();
+    if (!lastBatch) {
+      throw new Error('?');
+    }
+
+    for (const Entity of lastBatch) {
+      await this.persist(Entity);
+    }
   };
 
   private manifestWithRefs<C extends EntityC>(

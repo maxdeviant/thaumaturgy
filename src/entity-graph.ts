@@ -1,8 +1,8 @@
 import * as t from 'io-ts';
 import { ManifestedRef } from './ref';
-import { EntityName } from './types';
+import { EntityC, EntityName } from './types';
 
-export type ManifestWithRefs = <C extends t.Any>(
+export type ManifestWithRefs = <C extends EntityC>(
   Entity: C,
   overrides: Partial<t.TypeOf<C>>
 ) => {
@@ -10,17 +10,20 @@ export type ManifestWithRefs = <C extends t.Any>(
   refs: ManifestedRef<C, any>[];
 };
 
-export class EntityGraphNode<C extends t.Any> {
+export class EntityGraphNode<C extends EntityC> {
   readonly refs: EntityName[] = [];
 
   constructor(readonly Entity: C) {}
 }
 
 export class EntityGraph {
-  private readonly nodes: EntityGraphNode<t.Any>[] = [];
-  private readonly nodesByName = new Map<EntityName, EntityGraphNode<t.Any>>();
+  private readonly nodes: EntityGraphNode<EntityC>[] = [];
+  private readonly nodesByName = new Map<
+    EntityName,
+    EntityGraphNode<EntityC>
+  >();
 
-  constructor(entities: t.Any[], manifestWithRefs: ManifestWithRefs) {
+  constructor(entities: EntityC[], manifestWithRefs: ManifestWithRefs) {
     for (const Entity of entities) {
       const node = new EntityGraphNode(Entity);
       this.nodes.push(node);

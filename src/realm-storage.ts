@@ -6,10 +6,7 @@ import {
   PersisterNotFoundError,
 } from './errors';
 import { Sequence } from './sequence';
-import { EntityName, Manifester, Persister } from './types';
-import * as t from 'io-ts';
-import { ManifestedRef } from './ref';
-import { EntityGraph } from './entity-graph';
+import { EntityC, EntityName, Manifester, Persister } from './types';
 
 /**
  * The storage for a `Realm`.
@@ -19,7 +16,7 @@ import { EntityGraph } from './entity-graph';
  * @internal
  */
 export class RealmStorage {
-  private readonly entities = new Map<EntityName, t.Any>();
+  private readonly entities = new Map<EntityName, EntityC>();
   private readonly manifesters = new Map<EntityName, Manifester<any, any>>();
   private readonly persisters = new Map<EntityName, Persister<any>>();
   private readonly sequences = new Map<
@@ -27,7 +24,19 @@ export class RealmStorage {
     Record<string, Sequence<any>>
   >();
 
-  registerEntity<C extends t.Any>(Entity: C) {
+  /**
+   * The list of all entities defined with this storage.
+   */
+  get allEntities() {
+    return [...this.entities.values()];
+  }
+
+  /**
+   * Registers an entity under its name.
+   *
+   * @param Entity The entity to register.
+   */
+  registerEntity(Entity: EntityC) {
     const entityName = Entity.name;
 
     if (this.entities.has(entityName)) {
@@ -122,63 +131,6 @@ export class RealmStorage {
    */
   findSequences(entityName: EntityName) {
     return this.sequences.get(entityName);
-  }
-
-  buildEntityGraph({
-    manifestWithRefs,
-  }: {
-    manifestWithRefs: <C extends t.Any>(
-      Entity: C,
-      overrides: Partial<t.TypeOf<C>>
-    ) => {
-      manifestedEntity: any;
-      refs: ManifestedRef<C, any>[];
-    };
-  }) {
-    const entities = [...this.entities.values()];
-
-    const entityGraph = new EntityGraph(entities, manifestWithRefs);
-
-    const refCounts = entities
-      .flatMap(Entity => {
-        const node = entityGraph.get(Entity.name);
-
-        return node?.refs ?? [];
-      })
-      .reduce((acc, ref) => {
-        if (!acc[ref]) {
-          acc[ref] = 0;
-        }
-
-        acc[ref]++;
-
-        return acc;
-      }, {} as Record<EntityName, number>);
-
-    console.log(entityGraph);
-    console.log(refCounts);
-
-    const batches: t.Any[][] = [];
-
-    while (entities.length) {
-      const batch = entities.filter(Entity => {
-        const node = entityGraph.get(Entity.name);
-        if (!node) {
-          return false;
-        }
-
-        return node.refs.filter(ref => refCounts[ref]).length === 0;
-      });
-
-      batches.push(batch);
-
-      for (const Entity of batch) {
-        delete refCounts[Entity.name];
-        entities.splice(entities.indexOf(Entity), 1);
-      }
-    }
-
-    console.log(batches);
   }
 
   /**
