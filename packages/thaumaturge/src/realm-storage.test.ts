@@ -1,4 +1,3 @@
-import { Sequence } from 'thaumaturge';
 import {
   ManifesterAlreadyRegisteredError,
   ManifesterNotFoundError,
@@ -6,6 +5,7 @@ import {
   PersisterNotFoundError,
 } from './errors';
 import { RealmStorage } from './realm-storage';
+import { Sequence } from './sequence';
 
 describe('RealmStorage', () => {
   describe('registerManifester', () => {
