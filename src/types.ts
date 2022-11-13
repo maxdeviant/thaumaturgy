@@ -49,3 +49,5 @@ export type Persist = <C extends EntityC>(
   Entity: C,
   overrides?: Partial<t.TypeOf<C>>
 ) => Promise<t.TypeOf<C>>;
+
+export type PersistLeaves = () => Promise<unknown[]>;

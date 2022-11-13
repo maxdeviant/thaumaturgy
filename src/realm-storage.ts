@@ -1,11 +1,12 @@
 import {
+  EntityAlreadyRegisteredError,
   ManifesterAlreadyRegisteredError,
   ManifesterNotFoundError,
   PersisterAlreadyRegisteredError,
   PersisterNotFoundError,
 } from './errors';
 import { Sequence } from './sequence';
-import { EntityName, Manifester, Persister } from './types';
+import { EntityC, EntityName, Manifester, Persister } from './types';
 
 /**
  * The storage for a `Realm`.
@@ -15,12 +16,35 @@ import { EntityName, Manifester, Persister } from './types';
  * @internal
  */
 export class RealmStorage {
+  private readonly entities = new Map<EntityName, EntityC>();
   private readonly manifesters = new Map<EntityName, Manifester<any, any>>();
   private readonly persisters = new Map<EntityName, Persister<any>>();
   private readonly sequences = new Map<
     EntityName,
     Record<string, Sequence<any>>
   >();
+
+  /**
+   * The list of all entities defined with this storage.
+   */
+  get allEntities() {
+    return [...this.entities.values()];
+  }
+
+  /**
+   * Registers an entity under its name.
+   *
+   * @param Entity The entity to register.
+   */
+  registerEntity(Entity: EntityC) {
+    const entityName = Entity.name;
+
+    if (this.entities.has(entityName)) {
+      throw new EntityAlreadyRegisteredError(entityName);
+    }
+
+    this.entities.set(entityName, Entity);
+  }
 
   /**
    * Registers a manifester under the specified entity name.
@@ -109,11 +133,56 @@ export class RealmStorage {
     return this.sequences.get(entityName);
   }
 
+  snapshotSequences() {
+    const counterSnapshots = new Map<EntityName, Map<string, number>>();
+
+    for (const [entityName, sequences] of this.sequences) {
+      const sequenceSnapshots = new Map<string, number>();
+
+      for (const [sequenceName, sequence] of Object.entries(sequences)) {
+        sequenceSnapshots.set(sequenceName, sequence['counter']);
+      }
+
+      counterSnapshots.set(entityName, sequenceSnapshots);
+    }
+
+    return counterSnapshots;
+  }
+
+  restoreSequences(snapshot: Map<EntityName, Map<string, number>>) {
+    for (const [entityName, sequenceSnapshots] of snapshot) {
+      const sequences = this.sequences.get(entityName);
+      if (!sequences) {
+        continue;
+      }
+
+      for (const [sequenceName, counter] of sequenceSnapshots) {
+        const sequence = sequences[sequenceName];
+        if (!sequence) {
+          continue;
+        }
+
+        sequence['counter'] = counter;
+      }
+    }
+  }
+
+  withSnapshottedSequences<T>(thunk: () => T) {
+    const snapshot = this.snapshotSequences();
+
+    const result = thunk();
+
+    this.restoreSequences(snapshot);
+
+    return result;
+  }
+
   /**
    * Clears all manifesters and persisters registered with this `RealmStorage`
    * instance.
    */
   clear() {
+    this.entities.clear();
     this.manifesters.clear();
     this.persisters.clear();
     this.sequences.clear();

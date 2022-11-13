@@ -1,8 +1,9 @@
 import * as t from 'io-ts';
 import { v4 as uuidV4 } from 'uuid';
+import { topologicallyBatchEntities } from './entity-graph-utils';
 import { RealmStorage } from './realm-storage';
 import { isMappedRef, ManifestedRef, MappedRef } from './ref';
-import { Define, EntityC, Manifest, Persist } from './types';
+import { Define, EntityC, Manifest, Persist, PersistLeaves } from './types';
 
 /**
  * A realm is an isolated environment that entities may be registered with.
@@ -19,6 +20,7 @@ export class Realm {
     Entity,
     { manifest: manifester, persist: persister, sequences }
   ) => {
+    this.storage.registerEntity(Entity);
     this.storage.registerManifester(Entity.name, manifester);
 
     if (typeof persister === 'function') {
@@ -53,6 +55,29 @@ export class Realm {
     }
 
     return persister(manifestedEntity);
+  };
+
+  readonly persistLeaves: PersistLeaves = async () => {
+    const topologicallyBatchedEntities = this.storage.withSnapshottedSequences(
+      () =>
+        topologicallyBatchEntities(
+          this.storage.allEntities,
+          (Entity, overrides) => this.manifestWithRefs(Entity, overrides)
+        )
+    );
+
+    const lastBatch = topologicallyBatchedEntities.pop();
+    if (!lastBatch) {
+      throw new Error('No leaves found to persist.');
+    }
+
+    const persistedEntities: any[] = [];
+
+    for (const Entity of lastBatch) {
+      persistedEntities.push(await this.persist(Entity));
+    }
+
+    return persistedEntities;
   };
 
   private manifestWithRefs<C extends EntityC>(
