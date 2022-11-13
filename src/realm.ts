@@ -3,7 +3,7 @@ import { v4 as uuidV4 } from 'uuid';
 import { topologicallyBatchEntities } from './entity-graph-utils';
 import { RealmStorage } from './realm-storage';
 import { isMappedRef, ManifestedRef, MappedRef } from './ref';
-import { Define, EntityC, Manifest, Persist } from './types';
+import { Define, EntityC, Manifest, Persist, PersistLeaves } from './types';
 
 /**
  * A realm is an isolated environment that entities may be registered with.
@@ -57,7 +57,7 @@ export class Realm {
     return persister(manifestedEntity);
   };
 
-  readonly persistLeaves = async () => {
+  readonly persistLeaves: PersistLeaves = async () => {
     const topologicallyBatchedEntities = this.storage.withSnapshottedSequences(
       () =>
         topologicallyBatchEntities(

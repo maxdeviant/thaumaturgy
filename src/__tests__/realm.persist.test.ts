@@ -1,4 +1,5 @@
 import * as t from 'io-ts';
+import assert from 'node:assert';
 import { open } from 'sqlite';
 import sqlite3 from 'sqlite3';
 import { Realm } from '../realm';
@@ -310,7 +311,7 @@ describe('Realm', () => {
     });
   });
 
-  describe('persistAll', () => {
+  describe('persistLeaves', () => {
     const setupDatabase = async () => {
       const db = await open({
         filename: ':memory:',
@@ -426,6 +427,18 @@ describe('Realm', () => {
 
         const leaves = await realm.persistLeaves();
 
+        expect(leaves).toHaveLength(1);
+
+        const comment = leaves[0];
+        expect(Comment.is(comment)).toBe(true);
+        assert.ok(Comment.is(comment));
+
+        expect(comment).toEqual({
+          id: expect.any(String),
+          postId: expect.any(String),
+          username: 'user1',
+        });
+
         const authorsInDatabase = await db.all('select * from author');
 
         expect(authorsInDatabase).toEqual([
@@ -439,7 +452,7 @@ describe('Realm', () => {
 
         expect(postsInDatabase).toEqual([
           {
-            id: expect.any(String),
+            id: comment.postId,
             author_id: authorsInDatabase[0].id,
             title: 'Post 1',
           },
@@ -449,9 +462,9 @@ describe('Realm', () => {
 
         expect(commentsInDatabase).toEqual([
           {
-            id: expect.any(String),
-            post_id: postsInDatabase[0].id,
-            username: 'user1',
+            id: comment.id,
+            post_id: comment.postId,
+            username: comment.username,
           },
         ]);
       });
