@@ -1,6 +1,24 @@
 import { EntityName } from './types';
 
 /**
+ * An error thrown when an entity as not found.
+ */
+export class EntityNotFoundError extends Error {
+  constructor(entityName: EntityName) {
+    super(`No entity found with name '${entityName}'.`);
+  }
+}
+
+/**
+ * An error thrown when an entity was already registered.
+ */
+export class EntityAlreadyRegisteredError extends Error {
+  constructor(entityName: EntityName) {
+    super(`An entity is already registered as '${entityName}'.`);
+  }
+}
+
+/**
  * An error thrown when a manifester was not found for a given entity.
  */
 export class ManifesterNotFoundError extends Error {

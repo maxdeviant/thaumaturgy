@@ -19,6 +19,7 @@ export class Realm {
     Entity,
     { manifest: manifester, persist: persister, sequences }
   ) => {
+    this.storage.registerEntity(Entity);
     this.storage.registerManifester(Entity.name, manifester);
 
     if (typeof persister === 'function') {
@@ -53,6 +54,13 @@ export class Realm {
     }
 
     return persister(manifestedEntity);
+  };
+
+  readonly persistAll = async () => {
+    this.storage.buildEntityGraph({
+      manifestWithRefs: (Entity, overrides) =>
+        this.manifestWithRefs(Entity, overrides),
+    });
   };
 
   private manifestWithRefs<C extends EntityC>(
