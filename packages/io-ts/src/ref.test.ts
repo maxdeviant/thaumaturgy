@@ -1,10 +1,10 @@
+import { ManifesterOptions } from '@thaumaturgy/core';
 import * as E from 'fp-ts/Either';
 import * as O from 'fp-ts/Option';
 import * as t from 'io-ts';
 import { either, option } from 'io-ts-types';
 import { Realm } from './realm';
 import { Ref } from './ref';
-import { ManifesterOptions } from './types';
 
 describe('Ref', () => {
   describe('when used inside of an `Option`', () => {

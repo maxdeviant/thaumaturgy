@@ -1,6 +1,6 @@
-import { Realm as BackingRealm } from '@thaumaturgy/core';
+import { Realm as BackingRealm, PersistLeaves } from '@thaumaturgy/core';
 import { extractEntityName } from './entity-name';
-import { Define, Manifest, Persist, PersistLeaves } from './types';
+import { Define, Manifest, Persist } from './types';
 
 /**
  * A realm is an isolated environment that entities may be registered with.
