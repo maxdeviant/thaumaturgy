@@ -1,5 +1,5 @@
+import { Sequence } from '@thaumaturgy/core';
 import { z } from 'zod';
-import { Sequence } from 'thaumaturge';
 
 export type EntityName = string;
 

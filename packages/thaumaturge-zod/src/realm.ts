@@ -1,4 +1,4 @@
-import { Realm as BackingRealm } from 'thaumaturge';
+import { Realm as BackingRealm } from '@thaumaturgy/core';
 import { extractEntityName } from './entity-name';
 import { Define, Manifest, Persist, PersistLeaves } from './types';
 

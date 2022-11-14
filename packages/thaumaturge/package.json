@@ -1,5 +1,5 @@
 {
-  "name": "thaumaturge",
+  "name": "@thaumaturgy/core",
   "version": "0.10.0",
   "repository": "git@github.com:maxdeviant/thaumaturge.git",
   "author": "Marshall Bowers <elliott.codes@gmail.com>",

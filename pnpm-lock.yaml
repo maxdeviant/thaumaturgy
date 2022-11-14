@@ -31,6 +31,7 @@ importers:
 
   packages/thaumaturge-io-ts:
     specifiers:
+      '@thaumaturgy/core': workspace:*
       '@types/jest': 28.1.6
       '@types/uuid': 8.3.4
       fp-ts: 2.12.2
@@ -42,12 +43,11 @@ importers:
       prettier: 2.7.1
       sqlite: 4.1.2
       sqlite3: 5.0.10
-      thaumaturge: workspace:*
       ts-jest: 28.0.7
       tsuka: 0.0.4
       typescript: 4.7.4
     dependencies:
-      thaumaturge: link:../thaumaturge
+      '@thaumaturgy/core': link:../thaumaturge
     devDependencies:
       '@types/jest': 28.1.6
       '@types/uuid': 8.3.4
@@ -66,6 +66,7 @@ importers:
 
   packages/thaumaturge-zod:
     specifiers:
+      '@thaumaturgy/core': workspace:*
       '@types/jest': 28.1.6
       '@types/uuid': 8.3.4
       fp-ts: 2.12.2
@@ -73,13 +74,12 @@ importers:
       prettier: 2.7.1
       sqlite: 4.1.2
       sqlite3: 5.0.10
-      thaumaturge: workspace:*
       ts-jest: 28.0.7
       tsuka: 0.0.4
       typescript: 4.7.4
       zod: 3.19.1
     dependencies:
-      thaumaturge: link:../thaumaturge
+      '@thaumaturgy/core': link:../thaumaturge
     devDependencies:
       '@types/jest': 28.1.6
       '@types/uuid': 8.3.4

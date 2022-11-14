@@ -1,5 +1,5 @@
+import { MappedRef } from '@thaumaturgy/core';
 import * as t from 'io-ts';
-import { MappedRef } from 'thaumaturge';
 import { EntityC } from './types';
 
 /**

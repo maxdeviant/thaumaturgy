@@ -1,5 +1,5 @@
 {
-  "name": "thaumaturge-io-ts",
+  "name": "@thaumaturgy/io-ts",
   "version": "0.10.0",
   "repository": "git@github.com:maxdeviant/thaumaturge.git",
   "author": "Marshall Bowers <elliott.codes@gmail.com>",
@@ -34,7 +34,7 @@
     "io-ts": "2.x"
   },
   "dependencies": {
-    "thaumaturge": "workspace:*"
+    "@thaumaturgy/core": "workspace:*"
   },
   "devDependencies": {
     "@types/jest": "28.1.6",

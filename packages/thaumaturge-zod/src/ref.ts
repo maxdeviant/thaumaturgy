@@ -1,4 +1,4 @@
-import { MappedRef } from 'thaumaturge';
+import { MappedRef } from '@thaumaturgy/core';
 import { z } from 'zod';
 import { extractEntityName } from './entity-name';
 import { EntityC } from './types';

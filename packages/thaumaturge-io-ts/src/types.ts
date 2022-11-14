@@ -1,5 +1,5 @@
+import { Sequence } from '@thaumaturgy/core';
 import * as t from 'io-ts';
-import { Sequence } from 'thaumaturge';
 
 export type EntityName = string;
 
