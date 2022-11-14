@@ -4,9 +4,7 @@ import { RealmStorage } from './realm-storage';
 import { isMappedRef, ManifestedRef, MappedRef } from './ref';
 import { Define, Entity, Manifest, Persist, PersistLeaves } from './types';
 
-export const isUnknownRecord = (
-  value: unknown
-): value is Record<string, unknown> =>
+const isUnknownRecord = (value: unknown): value is Record<string, unknown> =>
   typeof value === 'object' && value !== null && !Array.isArray(value);
 
 /**
