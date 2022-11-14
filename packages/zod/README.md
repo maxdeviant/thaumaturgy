@@ -1,38 +1,32 @@
-# @thaumaturgy/core
+# @thaumaturgy/zod
 
-[![npm](https://img.shields.io/npm/v/thaumaturge.svg?maxAge=3600)](https://www.npmjs.com/package/thaumaturge)
-[![CI](https://github.com/maxdeviant/thaumaturge/actions/workflows/ci.yml/badge.svg?branch=master)](https://github.com/maxdeviant/thaumaturge/actions/workflows/ci.yml)
+Thaumaturgy is a fixtures and seeding library for TypeScript.
 
-Thaumaturge is a fixtures and seeding library powered by `io-ts`.
+This package contains bindings for [`zod`](https://github.com/colinhacks/zod).
 
 ## Installation
 
-Thaumaturge has peer dependencies on `io-ts` and `fp-ts`, so be sure to have those installed first.
-
-The `thaumaturge` package should then be installed as a development dependency:
-
-#### Yarn
+Install `@thaumaturgy/zod` as a development dependency:
 
 ```sh
-yarn add -D thaumaturge
+npm install -D @thaumaturgy/zod
 ```
 
-#### npm
-
-```sh
-npm install -D thaumaturge
-```
+> Note: `@thaumaturgy/zod` has a peer dependency on `zod`.
 
 ## Usage
 
 ```ts
-import * as t from 'io-ts';
-import { define, manifest } from 'thaumaturge';
+import { z } from 'zod';
+import { define, manifest } from '@thaumaturgy/zod';
 
-const Movie = t.strict({
-  title: t.string,
-  year: t.number,
-});
+const Movie = z
+  .object({
+    title: z.string(),
+    year: z.number(),
+  })
+  .strict()
+  .describe('Movie');
 
 define(Movie, {
   sequences: {
@@ -54,19 +48,23 @@ console.log(movie);
 ### Entity Hierarchies
 
 ```ts
-import * as t from 'io-ts';
+import { z } from 'zod';
 import { define, manifest, Ref } from 'thaumaturge';
 
-const Author = t.type({
-  id: t.string,
-  name: t.string,
-});
+const Author = z
+  .object({
+    id: z.string(),
+    name: z.string(),
+  })
+  .describe('Author');
 
-const Book = t.type({
-  id: t.string,
-  authorId: t.string,
-  title: t.string,
-});
+const Book = z
+  .object({
+    id: z.string(),
+    authorId: z.string(),
+    title: z.string(),
+  })
+  .describe('Book');
 
 define(Author, {
   manifest: ({ uuid }) => ({

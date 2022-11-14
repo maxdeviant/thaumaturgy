@@ -1,38 +1,32 @@
-# @thaumaturgy/core
+# @thaumaturgy/io-ts
 
-[![npm](https://img.shields.io/npm/v/thaumaturge.svg?maxAge=3600)](https://www.npmjs.com/package/thaumaturge)
-[![CI](https://github.com/maxdeviant/thaumaturge/actions/workflows/ci.yml/badge.svg?branch=master)](https://github.com/maxdeviant/thaumaturge/actions/workflows/ci.yml)
+Thaumaturgy is a fixtures and seeding library for TypeScript.
 
-Thaumaturge is a fixtures and seeding library powered by `io-ts`.
+This package contains bindings for [`io-ts`](https://github.com/gcanti/io-ts).
 
 ## Installation
 
-Thaumaturge has peer dependencies on `io-ts` and `fp-ts`, so be sure to have those installed first.
-
-The `thaumaturge` package should then be installed as a development dependency:
-
-#### Yarn
+Install `@thaumaturgy/io-ts` as a development dependency:
 
 ```sh
-yarn add -D thaumaturge
+npm install -D @thaumaturgy/io-ts
 ```
 
-#### npm
-
-```sh
-npm install -D thaumaturge
-```
+> Note: `@thaumaturgy/io-ts` has peer dependencies on `io-ts` and `fp-ts`.
 
 ## Usage
 
 ```ts
 import * as t from 'io-ts';
-import { define, manifest } from 'thaumaturge';
+import { define, manifest } from '@thaumaturgy/io-ts';
 
-const Movie = t.strict({
-  title: t.string,
-  year: t.number,
-});
+const Movie = t.strict(
+  {
+    title: t.string,
+    year: t.number,
+  },
+  'Movie'
+);
 
 define(Movie, {
   sequences: {
@@ -57,16 +51,22 @@ console.log(movie);
 import * as t from 'io-ts';
 import { define, manifest, Ref } from 'thaumaturge';
 
-const Author = t.type({
-  id: t.string,
-  name: t.string,
-});
+const Author = t.type(
+  {
+    id: t.string,
+    name: t.string,
+  },
+  'Author'
+);
 
-const Book = t.type({
-  id: t.string,
-  authorId: t.string,
-  title: t.string,
-});
+const Book = t.type(
+  {
+    id: t.string,
+    authorId: t.string,
+    title: t.string,
+  },
+  'Book'
+);
 
 define(Author, {
   manifest: ({ uuid }) => ({
