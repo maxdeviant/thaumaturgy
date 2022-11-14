@@ -2,7 +2,7 @@ lockfileVersion: 5.4
 
 importers:
 
-  packages/thaumaturge:
+  packages/core:
     specifiers:
       '@types/jest': 28.1.6
       '@types/uuid': 8.3.4
@@ -29,7 +29,7 @@ importers:
       tsuka: 0.0.4
       typescript: 4.7.4
 
-  packages/thaumaturge-io-ts:
+  packages/io-ts:
     specifiers:
       '@thaumaturgy/core': workspace:*
       '@types/jest': 28.1.6
@@ -47,7 +47,7 @@ importers:
       tsuka: 0.0.4
       typescript: 4.7.4
     dependencies:
-      '@thaumaturgy/core': link:../thaumaturge
+      '@thaumaturgy/core': link:../core
     devDependencies:
       '@types/jest': 28.1.6
       '@types/uuid': 8.3.4
@@ -64,7 +64,7 @@ importers:
       tsuka: 0.0.4
       typescript: 4.7.4
 
-  packages/thaumaturge-zod:
+  packages/zod:
     specifiers:
       '@thaumaturgy/core': workspace:*
       '@types/jest': 28.1.6
@@ -79,7 +79,7 @@ importers:
       typescript: 4.7.4
       zod: 3.19.1
     dependencies:
-      '@thaumaturgy/core': link:../thaumaturge
+      '@thaumaturgy/core': link:../core
     devDependencies:
       '@types/jest': 28.1.6
       '@types/uuid': 8.3.4
