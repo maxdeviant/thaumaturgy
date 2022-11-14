@@ -38,7 +38,6 @@
   },
   "devDependencies": {
     "@types/jest": "28.1.6",
-    "@types/uuid": "8.3.4",
     "fp-ts": "2.12.2",
     "io-ts": "2.2.17",
     "io-ts-types": "0.5.16",
