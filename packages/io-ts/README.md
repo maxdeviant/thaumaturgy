@@ -49,7 +49,7 @@ console.log(movie);
 
 ```ts
 import * as t from 'io-ts';
-import { define, manifest, Ref } from 'thaumaturge';
+import { define, manifest, Ref } from '@thaumaturgy/io-ts';
 
 const Author = t.type(
   {

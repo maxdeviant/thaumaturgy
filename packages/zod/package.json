@@ -1,14 +1,14 @@
 {
   "name": "@thaumaturgy/zod",
   "version": "0.10.0",
-  "repository": "git@github.com:maxdeviant/thaumaturge.git",
+  "repository": "git@github.com:maxdeviant/thaumaturgy.git",
   "author": "Marshall Bowers <elliott.codes@gmail.com>",
   "license": "MIT",
-  "description": "Thaumaturge is a fixtures and seeding library powered by `io-ts`.",
+  "description": "Thaumaturgy is a fixtures and seeding library for TypeScript.",
   "keywords": [
-    "thaumaturge",
+    "thaumaturgy",
     "typescript",
-    "io-ts",
+    "zod",
     "test",
     "testing",
     "fixture",

@@ -49,7 +49,7 @@ console.log(movie);
 
 ```ts
 import { z } from 'zod';
-import { define, manifest, Ref } from 'thaumaturge';
+import { define, manifest, Ref } from '@thaumaturgy/zod';
 
 const Author = z
   .object({
