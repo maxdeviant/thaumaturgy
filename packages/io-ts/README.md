@@ -1,5 +1,7 @@
 # @thaumaturgy/io-ts
 
+[![npm](https://img.shields.io/npm/v/@thaumaturgy/io-ts.svg?maxAge=3600)](https://www.npmjs.com/package/@thaumaturgy/io-ts)
+
 Thaumaturgy is a fixtures and seeding library for TypeScript.
 
 This package contains bindings for [`io-ts`](https://github.com/gcanti/io-ts).

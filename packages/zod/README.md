@@ -1,5 +1,7 @@
 # @thaumaturgy/zod
 
+[![npm](https://img.shields.io/npm/v/@thaumaturgy/zod.svg?maxAge=3600)](https://www.npmjs.com/package/@thaumaturgy/zod)
+
 Thaumaturgy is a fixtures and seeding library for TypeScript.
 
 This package contains bindings for [`zod`](https://github.com/colinhacks/zod).
