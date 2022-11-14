@@ -1,11 +1,9 @@
 import { v4 as uuidV4 } from 'uuid';
 import { topologicallyBatchEntities } from './entity-graph-utils';
+import { isUnknownRecord } from './is-unknown-record';
 import { RealmStorage } from './realm-storage';
 import { isMappedRef, ManifestedRef, MappedRef } from './ref';
 import { Define, Entity, Manifest, Persist, PersistLeaves } from './types';
-
-const isUnknownRecord = (value: unknown): value is Record<string, unknown> =>
-  typeof value === 'object' && value !== null && !Array.isArray(value);
 
 /**
  * A realm is an isolated environment that entities may be registered with.
