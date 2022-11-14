@@ -1,6 +1,3 @@
-import { pipe } from 'fp-ts/function';
-import * as NEA from 'fp-ts/NonEmptyArray';
-
 export class Sequence<T> {
   private counter = 1;
 
@@ -19,11 +16,12 @@ export class Sequence<T> {
    * @param n The number of items to take from the sequence.
    */
   take(n: number) {
-    return [
-      ...pipe(
-        NEA.range(1, n),
-        NEA.map(() => this.next())
-      ),
-    ];
+    const items: T[] = [];
+
+    for (let i = 1; i <= n; i++) {
+      items.push(this.next());
+    }
+
+    return items;
   }
 }

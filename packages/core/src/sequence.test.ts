@@ -1,10 +1,9 @@
-import { identity } from 'fp-ts/function';
 import { Sequence } from './sequence';
 
 describe('Sequence', () => {
   describe('next', () => {
     it('yields the next item in the sequence', () => {
-      const sequence = new Sequence(identity);
+      const sequence = new Sequence(n => n);
 
       expect([
         sequence.next(),
@@ -17,7 +16,7 @@ describe('Sequence', () => {
 
   describe('take', () => {
     it('yields the specified number of items from the sequence', () => {
-      const sequence = new Sequence(identity);
+      const sequence = new Sequence(n => n);
 
       expect(sequence.take(3)).toEqual([1, 2, 3]);
     });

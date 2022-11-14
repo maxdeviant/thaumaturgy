@@ -28,16 +28,12 @@
     "!lib/**/__tests__/",
     "!lib/**/*.test.{js,d.ts}"
   ],
-  "peerDependencies": {
-    "fp-ts": "2.x"
-  },
   "dependencies": {
     "uuid": "8.3.2"
   },
   "devDependencies": {
     "@types/jest": "28.1.6",
     "@types/uuid": "8.3.4",
-    "fp-ts": "2.12.2",
     "jest": "28.1.3",
     "prettier": "2.7.1",
     "sqlite": "4.1.2",
