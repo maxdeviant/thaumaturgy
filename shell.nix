@@ -1,7 +1,7 @@
 with import <nixpkgs> {};
 
 stdenv.mkDerivation {
-  name = "thaumaturge";
+  name = "Thaumaturgy";
 
   buildInputs = [
     nodejs

@@ -1,14 +1,18 @@
-import * as t from 'io-ts';
+import { Sequence } from '@thaumaturgy/core';
+import { z } from 'zod';
 // Importing from the root barrel file intentionally to simulate what library
 // consumers will see.
-import { define, manifest, Ref, Sequence } from '..';
+import { define, manifest, Ref } from '..';
 
 describe('Public API', () => {
   it('works with a basic example', () => {
-    const Movie = t.strict({
-      title: t.string,
-      year: t.number,
-    });
+    const Movie = z
+      .object({
+        title: z.string(),
+        year: z.number(),
+      })
+      .strict()
+      .describe('Movie');
 
     define(Movie, {
       sequences: {
@@ -30,10 +34,13 @@ describe('Public API', () => {
   });
 
   it('works with an entity containing an array field', () => {
-    const Post = t.strict({
-      title: t.string,
-      tags: t.array(t.string),
-    });
+    const Post = z
+      .object({
+        title: z.string(),
+        tags: z.array(z.string()),
+      })
+      .strict()
+      .describe('Post');
 
     define(Post, {
       manifest: ({ sequences }) => ({
@@ -55,16 +62,20 @@ describe('Public API', () => {
   });
 
   it('works with an entity hierarchy', () => {
-    const Author = t.type({
-      id: t.string,
-      name: t.string,
-    });
+    const Author = z
+      .object({
+        id: z.string(),
+        name: z.string(),
+      })
+      .describe('Author');
 
-    const Book = t.type({
-      id: t.string,
-      authorId: t.string,
-      title: t.string,
-    });
+    const Book = z
+      .object({
+        id: z.string(),
+        authorId: z.string(),
+        title: z.string(),
+      })
+      .describe('Book');
 
     define(Author, {
       manifest: ({ uuid }) => ({

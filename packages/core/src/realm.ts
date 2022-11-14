@@ -1,9 +1,13 @@
-import * as t from 'io-ts';
 import { v4 as uuidV4 } from 'uuid';
 import { topologicallyBatchEntities } from './entity-graph-utils';
 import { RealmStorage } from './realm-storage';
 import { isMappedRef, ManifestedRef, MappedRef } from './ref';
-import { Define, EntityC, Manifest, Persist, PersistLeaves } from './types';
+import { Define, Entity, Manifest, Persist, PersistLeaves } from './types';
+
+export const isUnknownRecord = (
+  value: unknown
+): value is Record<string, unknown> =>
+  typeof value === 'object' && value !== null && !Array.isArray(value);
 
 /**
  * A realm is an isolated environment that entities may be registered with.
@@ -92,9 +96,9 @@ export class Realm {
     return persistedEntities;
   };
 
-  private manifestWithRefs<C extends EntityC>(
+  private manifestWithRefs<C extends Entity, T>(
     Entity: C,
-    overrides: Partial<t.TypeOf<C>>
+    overrides: Partial<T>
   ) {
     const manifester = this.storage.findManifester(Entity.name);
     const sequences = this.storage.findSequences(Entity.name);
@@ -119,7 +123,7 @@ export class Realm {
         return processRef(value);
       }
 
-      if (t.UnknownRecord.is(value)) {
+      if (isUnknownRecord(value)) {
         const acc: Record<string, unknown> = {};
 
         for (const [subKey, subValue] of Object.entries(value)) {
@@ -147,7 +151,7 @@ export class Realm {
     return { manifestedEntity, refs };
   }
 
-  private manifestRef<C extends EntityC>(
+  private manifestRef<C extends Entity>(
     ref: MappedRef<C, any>
   ): [ManifestedRef<C, any>, ...ManifestedRef<any, any>[]] {
     const { manifestedEntity, refs } = this.manifestWithRefs(ref.Entity, {});
@@ -162,7 +166,7 @@ export class Realm {
     ];
   }
 
-  private persistRef<C extends EntityC>(ref: ManifestedRef<C, unknown>) {
+  private persistRef<C extends Entity>(ref: ManifestedRef<C, unknown>) {
     const persister = this.storage.findPersister(ref.Entity.name);
 
     return persister(ref.entity);

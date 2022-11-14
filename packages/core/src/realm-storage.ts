@@ -6,7 +6,7 @@ import {
   PersisterNotFoundError,
 } from './errors';
 import { Sequence } from './sequence';
-import { EntityC, EntityName, Manifester, Persister } from './types';
+import { Entity, EntityName, Manifester, Persister } from './types';
 
 /**
  * The storage for a `Realm`.
@@ -16,7 +16,7 @@ import { EntityC, EntityName, Manifester, Persister } from './types';
  * @internal
  */
 export class RealmStorage {
-  private readonly entities = new Map<EntityName, EntityC>();
+  private readonly entities = new Map<EntityName, Entity>();
   private readonly manifesters = new Map<EntityName, Manifester<any, any>>();
   private readonly persisters = new Map<EntityName, Persister<any>>();
   private readonly sequences = new Map<
@@ -36,7 +36,7 @@ export class RealmStorage {
    *
    * @param Entity The entity to register.
    */
-  registerEntity(Entity: EntityC) {
+  registerEntity(Entity: Entity) {
     const entityName = Entity.name;
 
     if (this.entities.has(entityName)) {

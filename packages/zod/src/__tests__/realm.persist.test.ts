@@ -1,9 +1,9 @@
-import * as t from 'io-ts';
+import { Sequence } from '@thaumaturgy/core';
 import { open } from 'sqlite';
 import sqlite3 from 'sqlite3';
+import { z } from 'zod';
 import { Realm } from '../realm';
 import { Ref } from '../ref';
-import { Sequence } from '../sequence';
 
 describe('Realm', () => {
   describe('persist', () => {
@@ -16,10 +16,12 @@ describe('Realm', () => {
       return { db };
     };
 
-    const Car = t.type({
-      make: t.string,
-      model: t.string,
-    });
+    const Car = z
+      .object({
+        make: z.string(),
+        model: z.string(),
+      })
+      .describe('Car');
 
     const performSetup = async () => {
       const { db } = await setupDatabase();
@@ -80,11 +82,15 @@ describe('Realm', () => {
     });
 
     describe('for an entity hierarchy', () => {
-      const Kingdom = t.type({ name: t.string });
+      const Kingdom = z.object({ name: z.string() }).describe('Kingdom');
 
-      const Phylum = t.type({ kingdom: t.string, name: t.string });
+      const Phylum = z
+        .object({ kingdom: z.string(), name: z.string() })
+        .describe('Phylum');
 
-      const Class = t.type({ phylum: t.string, name: t.string });
+      const Class = z
+        .object({ phylum: z.string(), name: z.string() })
+        .describe('Class');
 
       const performSetup = async () => {
         const { db } = await setupDatabase();
@@ -176,25 +182,25 @@ describe('Realm', () => {
     });
 
     describe('for an entity hierarchy with randomly-generated IDs', () => {
-      const Author = t.type({ id: t.string, name: t.string }, 'Author');
+      const Author = z
+        .object({ id: z.string(), name: z.string() })
+        .describe('Author');
 
-      const Post = t.type(
-        {
-          id: t.string,
-          authorId: t.string,
-          title: t.string,
-        },
-        'Post'
-      );
+      const Post = z
+        .object({
+          id: z.string(),
+          authorId: z.string(),
+          title: z.string(),
+        })
+        .describe('Post');
 
-      const Comment = t.type(
-        {
-          id: t.string,
-          postId: t.string,
-          username: t.string,
-        },
-        'Comment'
-      );
+      const Comment = z
+        .object({
+          id: z.string(),
+          postId: z.string(),
+          username: z.string(),
+        })
+        .describe('Comment');
 
       const performSetup = async () => {
         const { db } = await setupDatabase();
