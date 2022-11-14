@@ -7,6 +7,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Added
+
+- **@thaumaturgy/io-ts**: Added re-exports from `@thaumaturgy/core`
+- **@thaumaturgy/zod**: Added re-exports from `@thaumaturgy/core`
+
 ## [0.11.0] - 2022-11-13
 
 ### Added
