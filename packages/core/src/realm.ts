@@ -1,4 +1,4 @@
-import { v4 as uuidV4 } from 'uuid';
+import { randomUUID } from 'crypto';
 import { topologicallyBatchEntities } from './entity-graph-utils';
 import { isUnknownRecord } from './is-unknown-record';
 import { RealmStorage } from './realm-storage';
@@ -100,7 +100,7 @@ export class Realm {
     const sequences = this.storage.findSequences(Entity.name);
 
     const manifestedEntity = manifester({
-      uuid: () => uuidV4(),
+      uuid: () => randomUUID(),
       sequences,
     });
 
