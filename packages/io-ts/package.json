@@ -1,6 +1,6 @@
 {
   "name": "@thaumaturgy/io-ts",
-  "version": "0.12.1",
+  "version": "0.13.0",
   "repository": "git@github.com:maxdeviant/thaumaturgy.git",
   "author": "Marshall Bowers <elliott.codes@gmail.com>",
   "license": "MIT",
