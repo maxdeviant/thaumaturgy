@@ -3,6 +3,7 @@ import * as t from 'io-ts';
 import assert from 'node:assert';
 import { open } from 'sqlite';
 import sqlite3 from 'sqlite3';
+import { describe, expect, it } from 'vitest';
 import { Realm } from '../realm';
 import { Ref } from '../ref';
 

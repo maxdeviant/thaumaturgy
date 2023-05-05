@@ -1,4 +1,5 @@
 import * as t from 'io-ts';
+import { describe, expect, it } from 'vitest';
 import { Realm } from '../realm';
 
 describe('io-ts Codecs', () => {

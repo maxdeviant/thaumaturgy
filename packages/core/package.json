@@ -20,7 +20,7 @@
   "scripts": {
     "format": "prettier --ignore-path .gitignore --write '**/*.+(js|json|md|ts|tsx)'",
     "build": "tsc -p .",
-    "test": "jest",
+    "test": "vitest run",
     "doc": "tsuka './src/**/*.ts'"
   },
   "files": [
@@ -28,16 +28,13 @@
     "!lib/**/__tests__/",
     "!lib/**/*.test.{js,d.ts}"
   ],
-  "dependencies": {},
   "devDependencies": {
-    "@types/jest": "28.1.6",
     "@types/node": "18.15.8",
-    "jest": "28.1.3",
     "prettier": "2.7.1",
     "sqlite": "4.1.2",
     "sqlite3": "5.0.10",
-    "ts-jest": "28.0.7",
     "tsuka": "0.0.4",
-    "typescript": "4.7.4"
+    "typescript": "4.7.4",
+    "vitest": "0.31.0"
   }
 }

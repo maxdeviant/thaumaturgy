@@ -1,4 +1,5 @@
 import * as t from 'io-ts';
+import { beforeAll, describe, expect, it, vi } from 'vitest';
 import { Realm } from '../realm';
 import { Ref } from '../ref';
 
@@ -54,13 +55,13 @@ describe('Realm', () => {
       const performSetup = () => {
         const realm = new Realm();
 
-        const kingdomManifester = jest.fn(() => ({ name: 'Animalia' }));
+        const kingdomManifester = vi.fn(() => ({ name: 'Animalia' }));
 
         realm.define(Kingdom, {
           manifest: kingdomManifester,
         });
 
-        const phylumManifester = jest.fn(() => ({
+        const phylumManifester = vi.fn(() => ({
           kingdom: Ref.to(Kingdom).through(kingdom => kingdom.name),
           name: 'Chordata',
         }));
@@ -69,7 +70,7 @@ describe('Realm', () => {
           manifest: phylumManifester,
         });
 
-        const classManifester = jest.fn(() => ({
+        const classManifester = vi.fn(() => ({
           phylum: Ref.to(Phylum).through(phylum => phylum.name),
           name: 'Mammalia',
         }));

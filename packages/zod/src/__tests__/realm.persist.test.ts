@@ -1,6 +1,7 @@
 import { Sequence } from '@thaumaturgy/core';
 import { open } from 'sqlite';
 import sqlite3 from 'sqlite3';
+import { describe, expect, it } from 'vitest';
 import { z } from 'zod';
 import { Realm } from '../realm';
 import { Ref } from '../ref';
