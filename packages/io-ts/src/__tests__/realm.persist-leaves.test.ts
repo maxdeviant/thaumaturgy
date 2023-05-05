@@ -1,18 +1,42 @@
 import { Sequence } from '@thaumaturgy/core';
 import * as t from 'io-ts';
 import assert from 'node:assert';
-import { open } from 'sqlite';
-import sqlite3 from 'sqlite3';
+import SqliteDatabase from 'better-sqlite3';
+import { Kysely, SqliteDialect, sql } from 'kysely';
 import { describe, expect, it } from 'vitest';
 import { Realm } from '../realm';
 import { Ref } from '../ref';
 
+interface Author {
+  id: string;
+  name: string;
+}
+
+interface Post {
+  id: string;
+  author_id: string;
+  title: string;
+}
+
+interface Comment {
+  id: string;
+  post_id: string;
+  username: string;
+}
+
+interface Database {
+  author: Author;
+  post: Post;
+  comment: Comment;
+}
+
 describe('Realm', () => {
   describe('persistLeaves', () => {
     const setupDatabase = async () => {
-      const db = await open({
-        filename: ':memory:',
-        driver: sqlite3.Database,
+      const db = new Kysely<Database>({
+        dialect: new SqliteDialect({
+          database: async () => new SqliteDatabase(':memory:'),
+        }),
       });
 
       return { db };
@@ -42,16 +66,33 @@ describe('Realm', () => {
       const performSetup = async () => {
         const { db } = await setupDatabase();
 
-        await db.exec('pragma foreign_keys = on');
-        await db.exec(
-          'create table author (id text primary key, name text not null)'
-        );
-        await db.exec(
-          'create table post (id text primary key, author_id text not null, title text not null, foreign key(author_id) references author(id))'
-        );
-        await db.exec(
-          'create table comment (id text primary key, post_id text not null, username text not null, foreign key(post_id) references post(id))'
-        );
+        await sql`pragma foreign_keys = on`.execute(db);
+
+        await db.schema
+          .createTable('author')
+          .addColumn('id', 'text', col => col.primaryKey())
+          .addColumn('name', 'text', col => col.notNull())
+          .execute();
+
+        await db.schema
+          .createTable('post')
+          .addColumn('id', 'text', col => col.primaryKey())
+          .addColumn('author_id', 'text', col => col.notNull())
+          .addColumn('title', 'text', col => col.notNull())
+          .addForeignKeyConstraint('post_author_id', ['author_id'], 'author', [
+            'id',
+          ])
+          .execute();
+
+        await db.schema
+          .createTable('comment')
+          .addColumn('id', 'text', col => col.primaryKey())
+          .addColumn('post_id', 'text', col => col.notNull())
+          .addColumn('username', 'text', col => col.notNull())
+          .addForeignKeyConstraint('comment_post_id', ['post_id'], 'post', [
+            'id',
+          ])
+          .execute();
 
         const realm = new Realm();
 
@@ -64,11 +105,10 @@ describe('Realm', () => {
             name: sequences.names.next(),
           }),
           persist: async author => {
-            await db.run(
-              'insert into author (id, name) values (?, ?)',
-              author.id,
-              author.name
-            );
+            await db
+              .insertInto('author')
+              .values({ id: author.id, name: author.name })
+              .execute();
 
             return author;
           },
@@ -84,12 +124,14 @@ describe('Realm', () => {
             title: sequences.titles.next(),
           }),
           persist: async post => {
-            await db.run(
-              'insert into post (id, author_id, title) values (?, ?, ?)',
-              post.id,
-              post.authorId,
-              post.title
-            );
+            await db
+              .insertInto('post')
+              .values({
+                id: post.id,
+                author_id: post.authorId,
+                title: post.title,
+              })
+              .execute();
 
             return post;
           },
@@ -105,12 +147,14 @@ describe('Realm', () => {
             username: sequences.usernames.next(),
           }),
           persist: async comment => {
-            await db.run(
-              'insert into comment (id, post_id, username) values (?, ?, ?)',
-              comment.id,
-              comment.postId,
-              comment.username
-            );
+            await db
+              .insertInto('comment')
+              .values({
+                id: comment.id,
+                post_id: comment.postId,
+                username: comment.username,
+              })
+              .execute();
 
             return comment;
           },
@@ -136,7 +180,10 @@ describe('Realm', () => {
           username: 'user1',
         });
 
-        const authorsInDatabase = await db.all('select * from author');
+        const authorsInDatabase = await db
+          .selectFrom('author')
+          .selectAll()
+          .execute();
 
         expect(authorsInDatabase).toEqual([
           {
@@ -145,17 +192,23 @@ describe('Realm', () => {
           },
         ]);
 
-        const postsInDatabase = await db.all('select * from post');
+        const postsInDatabase = await db
+          .selectFrom('post')
+          .selectAll()
+          .execute();
 
         expect(postsInDatabase).toEqual([
           {
             id: comment.postId,
-            author_id: authorsInDatabase[0].id,
+            author_id: authorsInDatabase[0]?.id,
             title: 'Post 1',
           },
         ]);
 
-        const commentsInDatabase = await db.all('select * from comment');
+        const commentsInDatabase = await db
+          .selectFrom('comment')
+          .selectAll()
+          .execute();
 
         expect(commentsInDatabase).toEqual([
           {

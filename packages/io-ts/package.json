@@ -37,14 +37,15 @@
     "@thaumaturgy/core": "workspace:*"
   },
   "devDependencies": {
+    "@types/better-sqlite3": "7.6.4",
+    "better-sqlite3": "8.3.0",
     "fp-ts": "2.12.2",
     "io-ts": "2.2.17",
     "io-ts-types": "0.5.16",
+    "kysely": "0.24.2",
     "monocle-ts": "2.3.13",
     "newtype-ts": "0.3.5",
     "prettier": "2.7.1",
-    "sqlite": "4.1.2",
-    "sqlite3": "5.0.10",
     "tsuka": "0.0.4",
     "typescript": "4.7.4",
     "vitest": "0.31.0"

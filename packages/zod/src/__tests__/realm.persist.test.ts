@@ -1,17 +1,64 @@
 import { Sequence } from '@thaumaturgy/core';
-import { open } from 'sqlite';
-import sqlite3 from 'sqlite3';
+import SqliteDatabase from 'better-sqlite3';
+import { Kysely, SqliteDialect, sql } from 'kysely';
 import { describe, expect, it } from 'vitest';
 import { z } from 'zod';
 import { Realm } from '../realm';
 import { Ref } from '../ref';
 
+interface Car {
+  make: string;
+  model: string;
+}
+
+interface Kingdom {
+  name: string;
+}
+
+interface Phylum {
+  kingdom: string;
+  name: string;
+}
+
+interface Class {
+  phylum: string;
+  name: string;
+}
+
+interface Author {
+  id: string;
+  name: string;
+}
+
+interface Post {
+  id: string;
+  author_id: string;
+  title: string;
+}
+
+interface Comment {
+  id: string;
+  post_id: string;
+  username: string;
+}
+
+interface Database {
+  car: Car;
+  kingdom: Kingdom;
+  phylum: Phylum;
+  class: Class;
+  author: Author;
+  post: Post;
+  comment: Comment;
+}
+
 describe('Realm', () => {
   describe('persist', () => {
     const setupDatabase = async () => {
-      const db = await open({
-        filename: ':memory:',
-        driver: sqlite3.Database,
+      const db = new Kysely<Database>({
+        dialect: new SqliteDialect({
+          database: async () => new SqliteDatabase(':memory:'),
+        }),
       });
 
       return { db };
@@ -27,7 +74,11 @@ describe('Realm', () => {
     const performSetup = async () => {
       const { db } = await setupDatabase();
 
-      await db.exec('create table car (make text, model text)');
+      await db.schema
+        .createTable('car')
+        .addColumn('make', 'text', col => col.notNull())
+        .addColumn('model', 'text', col => col.notNull())
+        .execute();
 
       const realm = new Realm();
 
@@ -37,7 +88,10 @@ describe('Realm', () => {
           model: 'Civic',
         }),
         persist: async car => {
-          await db.run('insert into car values (?, ?)', car.make, car.model);
+          await db
+            .insertInto('car')
+            .values({ make: car.make, model: car.model })
+            .execute();
 
           return car;
         },
@@ -57,7 +111,10 @@ describe('Realm', () => {
           model: 'Civic',
         });
 
-        const carFromDatabase = await db.get('select make, model from car');
+        const carFromDatabase = await db
+          .selectFrom('car')
+          .select(['make', 'model'])
+          .executeTakeFirst();
 
         expect(carFromDatabase).toEqual(persisted);
       });
@@ -76,7 +133,10 @@ describe('Realm', () => {
           model: 'CRV',
         });
 
-        const carFromDatabase = await db.get('select make, model from car');
+        const carFromDatabase = await db
+          .selectFrom('car')
+          .select(['make', 'model'])
+          .executeTakeFirst();
 
         expect(carFromDatabase).toEqual(persisted);
       });
@@ -96,21 +156,40 @@ describe('Realm', () => {
       const performSetup = async () => {
         const { db } = await setupDatabase();
 
-        await db.exec('pragma foreign_keys = on');
-        await db.exec('create table kingdom (name text primary key)');
-        await db.exec(
-          'create table phylum (kingdom text, name text primary key, foreign key(kingdom) references kingdom(name))'
-        );
-        await db.exec(
-          'create table class (phylum text, name text primary key, foreign key(phylum) references phylum(name))'
-        );
+        await sql`pragma foreign_keys = on`.execute(db);
+
+        await db.schema
+          .createTable('kingdom')
+          .addColumn('name', 'text', col => col.primaryKey())
+          .execute();
+
+        await db.schema
+          .createTable('phylum')
+          .addColumn('kingdom', 'text', col => col.notNull())
+          .addColumn('name', 'text', col => col.primaryKey())
+          .addForeignKeyConstraint('phylum_kingdom', ['kingdom'], 'kingdom', [
+            'name',
+          ])
+          .execute();
+
+        await db.schema
+          .createTable('class')
+          .addColumn('phylum', 'text', col => col.notNull())
+          .addColumn('name', 'text', col => col.primaryKey())
+          .addForeignKeyConstraint('class_phylum', ['phylum'], 'phylum', [
+            'name',
+          ])
+          .execute();
 
         const realm = new Realm();
 
         realm.define(Kingdom, {
           manifest: () => ({ name: 'Animalia' }),
           persist: async kingdom => {
-            await db.run('insert into kingdom values (?)', kingdom.name);
+            await db
+              .insertInto('kingdom')
+              .values({ name: kingdom.name })
+              .execute();
 
             return kingdom;
           },
@@ -122,11 +201,10 @@ describe('Realm', () => {
             name: 'Chordata',
           }),
           persist: async phylum => {
-            await db.run(
-              'insert into phylum values (?, ?)',
-              phylum.kingdom,
-              phylum.name
-            );
+            await db
+              .insertInto('phylum')
+              .values({ kingdom: phylum.kingdom, name: phylum.name })
+              .execute();
 
             return phylum;
           },
@@ -138,11 +216,10 @@ describe('Realm', () => {
             name: 'Mammalia',
           }),
           persist: async class_ => {
-            await db.run(
-              'insert into class values (?, ?)',
-              class_.phylum,
-              class_.name
-            );
+            await db
+              .insertInto('class')
+              .values({ phylum: class_.phylum, name: class_.name })
+              .execute();
 
             return class_;
           },
@@ -161,22 +238,27 @@ describe('Realm', () => {
           name: 'Mammalia',
         });
 
-        const classFromDatabase = await db.get(
-          'select phylum, name from class'
-        );
+        const classFromDatabase = await db
+          .selectFrom('class')
+          .select(['phylum', 'name'])
+          .executeTakeFirst();
 
         expect(classFromDatabase).toEqual(persisted);
 
-        const phylumFromDatabase = await db.get(
-          'select kingdom, name from phylum'
-        );
+        const phylumFromDatabase = await db
+          .selectFrom('phylum')
+          .select(['kingdom', 'name'])
+          .executeTakeFirst();
 
         expect(phylumFromDatabase).toEqual({
           kingdom: 'Animalia',
           name: 'Chordata',
         });
 
-        const kingdomFromDatabase = await db.get('select name from kingdom');
+        const kingdomFromDatabase = await db
+          .selectFrom('kingdom')
+          .select('name')
+          .executeTakeFirst();
 
         expect(kingdomFromDatabase).toEqual({ name: 'Animalia' });
       });
@@ -206,16 +288,33 @@ describe('Realm', () => {
       const performSetup = async () => {
         const { db } = await setupDatabase();
 
-        await db.exec('pragma foreign_keys = on');
-        await db.exec(
-          'create table author (id text primary key, name text not null)'
-        );
-        await db.exec(
-          'create table post (id text primary key, author_id text not null, title text not null, foreign key(author_id) references author(id))'
-        );
-        await db.exec(
-          'create table comment (id text primary key, post_id text not null, username text not null, foreign key(post_id) references post(id))'
-        );
+        await sql`pragma foreign_keys = on`.execute(db);
+
+        await db.schema
+          .createTable('author')
+          .addColumn('id', 'text', col => col.primaryKey())
+          .addColumn('name', 'text', col => col.notNull())
+          .execute();
+
+        await db.schema
+          .createTable('post')
+          .addColumn('id', 'text', col => col.primaryKey())
+          .addColumn('author_id', 'text', col => col.notNull())
+          .addColumn('title', 'text', col => col.notNull())
+          .addForeignKeyConstraint('post_author_id', ['author_id'], 'author', [
+            'id',
+          ])
+          .execute();
+
+        await db.schema
+          .createTable('comment')
+          .addColumn('id', 'text', col => col.primaryKey())
+          .addColumn('post_id', 'text', col => col.notNull())
+          .addColumn('username', 'text', col => col.notNull())
+          .addForeignKeyConstraint('comment_post_id', ['post_id'], 'post', [
+            'id',
+          ])
+          .execute();
 
         const realm = new Realm();
 
@@ -228,11 +327,10 @@ describe('Realm', () => {
             name: sequences.names.next(),
           }),
           persist: async author => {
-            await db.run(
-              'insert into author (id, name) values (?, ?)',
-              author.id,
-              author.name
-            );
+            await db
+              .insertInto('author')
+              .values({ id: author.id, name: author.name })
+              .execute();
 
             return author;
           },
@@ -248,12 +346,14 @@ describe('Realm', () => {
             title: sequences.titles.next(),
           }),
           persist: async post => {
-            await db.run(
-              'insert into post (id, author_id, title) values (?, ?, ?)',
-              post.id,
-              post.authorId,
-              post.title
-            );
+            await db
+              .insertInto('post')
+              .values({
+                id: post.id,
+                author_id: post.authorId,
+                title: post.title,
+              })
+              .execute();
 
             return post;
           },
@@ -269,12 +369,14 @@ describe('Realm', () => {
             username: sequences.usernames.next(),
           }),
           persist: async comment => {
-            await db.run(
-              'insert into comment (id, post_id, username) values (?, ?, ?)',
-              comment.id,
-              comment.postId,
-              comment.username
-            );
+            await db
+              .insertInto('comment')
+              .values({
+                id: comment.id,
+                post_id: comment.postId,
+                username: comment.username,
+              })
+              .execute();
 
             return comment;
           },
@@ -288,7 +390,10 @@ describe('Realm', () => {
 
         const comment = await realm.persist(Comment);
 
-        const commentsInDatabase = await db.all('select * from comment');
+        const commentsInDatabase = await db
+          .selectFrom('comment')
+          .selectAll()
+          .execute();
 
         expect(commentsInDatabase).toEqual([
           {
@@ -298,7 +403,10 @@ describe('Realm', () => {
           },
         ]);
 
-        const postsInDatabase = await db.all('select * from post');
+        const postsInDatabase = await db
+          .selectFrom('post')
+          .selectAll()
+          .execute();
 
         expect(postsInDatabase).toEqual([
           {
@@ -308,10 +416,13 @@ describe('Realm', () => {
           },
         ]);
 
-        const authorsInDatabase = await db.all('select * from author');
+        const authorsInDatabase = await db
+          .selectFrom('author')
+          .selectAll()
+          .execute();
 
         expect(authorsInDatabase).toEqual([
-          { id: postsInDatabase[0].author_id, name: expect.any(String) },
+          { id: postsInDatabase[0]?.author_id, name: expect.any(String) },
         ]);
       });
     });
