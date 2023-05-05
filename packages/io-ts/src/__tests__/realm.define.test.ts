@@ -1,4 +1,5 @@
 import * as t from 'io-ts';
+import { describe, expect, it, vi } from 'vitest';
 import { Realm } from '../realm';
 
 describe('Realm', () => {
@@ -14,7 +15,7 @@ describe('Realm', () => {
       it('calls the manifester', () => {
         const realm = new Realm();
 
-        const manifester = jest.fn<Movie, []>(() => ({
+        const manifester = vi.fn<[], Movie>(() => ({
           title: 'Pulp Fiction',
           year: 1994 as t.Int,
         }));
@@ -29,7 +30,7 @@ describe('Realm', () => {
       it('passes a `uuid` function to the manifester', () => {
         const realm = new Realm();
 
-        const manifester = jest.fn<Movie, []>(() => ({
+        const manifester = vi.fn<[], Movie>(() => ({
           title: 'Pulp Fiction',
           year: 1994 as t.Int,
         }));
@@ -48,7 +49,7 @@ describe('Realm', () => {
       it('calls the persister', async () => {
         const realm = new Realm();
 
-        const persister = jest.fn(movie => Promise.resolve(movie));
+        const persister = vi.fn(movie => Promise.resolve(movie));
 
         realm.define(Movie, {
           manifest: () => ({ title: 'Arrival', year: 2017 as t.Int }),
@@ -63,7 +64,7 @@ describe('Realm', () => {
       it('passes the manifested entity to the persister', async () => {
         const realm = new Realm();
 
-        const persister = jest.fn(movie => Promise.resolve(movie));
+        const persister = vi.fn(movie => Promise.resolve(movie));
 
         realm.define(Movie, {
           manifest: () => ({ title: 'Arrival', year: 2017 as t.Int }),

@@ -1,3 +1,4 @@
+import { describe, expect, it } from 'vitest';
 import { isUnknownRecord } from './is-unknown-record';
 
 describe('isUnknownRecord', () => {

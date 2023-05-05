@@ -3,6 +3,7 @@ import * as E from 'fp-ts/Either';
 import * as O from 'fp-ts/Option';
 import * as t from 'io-ts';
 import { either, option } from 'io-ts-types';
+import { describe, expect, it, vi } from 'vitest';
 import { Realm } from './realm';
 import { Ref } from './ref';
 
@@ -18,9 +19,9 @@ describe('Ref', () => {
         authorId: option(t.string),
       });
 
-      const authorManifester = jest.fn<
-        t.TypeOf<typeof Author>,
-        [ManifesterOptions<unknown>]
+      const authorManifester = vi.fn<
+        [ManifesterOptions<unknown>],
+        t.TypeOf<typeof Author>
       >(({ uuid }) => ({ id: uuid() }));
 
       realm.define(Author, {
@@ -54,9 +55,9 @@ describe('Ref', () => {
           authorId: either(t.string, t.string),
         });
 
-        const authorManifester = jest.fn<
-          t.TypeOf<typeof Author>,
-          [ManifesterOptions<unknown>]
+        const authorManifester = vi.fn<
+          [ManifesterOptions<unknown>],
+          t.TypeOf<typeof Author>
         >(({ uuid }) => ({ id: uuid() }));
 
         realm.define(Author, {
@@ -89,9 +90,9 @@ describe('Ref', () => {
           authorId: either(t.string, t.string),
         });
 
-        const authorManifester = jest.fn<
-          t.TypeOf<typeof Author>,
-          [ManifesterOptions<unknown>]
+        const authorManifester = vi.fn<
+          [ManifesterOptions<unknown>],
+          t.TypeOf<typeof Author>
         >(({ uuid }) => ({ id: uuid() }));
 
         realm.define(Author, {
@@ -137,9 +138,9 @@ describe('Ref', () => {
         }),
       });
 
-      const authorManifester = jest.fn<
-        t.TypeOf<typeof Author>,
-        [ManifesterOptions<unknown>]
+      const authorManifester = vi.fn<
+        [ManifesterOptions<unknown>],
+        t.TypeOf<typeof Author>
       >(({ uuid }) => ({ id: uuid() }));
 
       realm.define(Author, {

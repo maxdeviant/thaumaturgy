@@ -15,7 +15,7 @@
     "strict": true,
     "stripInternal": true,
     "target": "ES6",
-    "lib": ["ES2019"]
+    "lib": ["ES2019", "DOM"]
   },
   "include": ["src"]
 }

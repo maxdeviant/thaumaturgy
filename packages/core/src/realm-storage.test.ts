@@ -1,3 +1,4 @@
+import { describe, expect, it, vi } from 'vitest';
 import {
   ManifesterAlreadyRegisteredError,
   ManifesterNotFoundError,
@@ -12,7 +13,7 @@ describe('RealmStorage', () => {
     it('registers the manifester in the realm storage', () => {
       const storage = new RealmStorage();
 
-      const manifester = jest.fn();
+      const manifester = vi.fn();
 
       storage.registerManifester('User', manifester);
 
@@ -25,9 +26,9 @@ describe('RealmStorage', () => {
       it('throws a `ManifesterAlreadyRegisteredError`', () => {
         const storage = new RealmStorage();
 
-        storage.registerManifester('Animal', jest.fn());
+        storage.registerManifester('Animal', vi.fn());
 
-        expect(() => storage.registerManifester('Animal', jest.fn())).toThrow(
+        expect(() => storage.registerManifester('Animal', vi.fn())).toThrow(
           new ManifesterAlreadyRegisteredError('Animal')
         );
       });
@@ -39,7 +40,7 @@ describe('RealmStorage', () => {
       it('returns the manifester', () => {
         const storage = new RealmStorage();
 
-        const manifester = jest.fn();
+        const manifester = vi.fn();
 
         storage.registerManifester('User', manifester);
 
@@ -64,7 +65,7 @@ describe('RealmStorage', () => {
     it('registers the persister in the realm storage', () => {
       const storage = new RealmStorage();
 
-      const persister = jest.fn();
+      const persister = vi.fn();
 
       storage.registerPersister('User', persister);
 
@@ -77,9 +78,9 @@ describe('RealmStorage', () => {
       it('throws a `PersisterAlreadyRegisteredError`', () => {
         const storage = new RealmStorage();
 
-        storage.registerPersister('Animal', jest.fn());
+        storage.registerPersister('Animal', vi.fn());
 
-        expect(() => storage.registerPersister('Animal', jest.fn())).toThrow(
+        expect(() => storage.registerPersister('Animal', vi.fn())).toThrow(
           new PersisterAlreadyRegisteredError('Animal')
         );
       });
@@ -91,7 +92,7 @@ describe('RealmStorage', () => {
       it('returns the persister', () => {
         const storage = new RealmStorage();
 
-        const persister = jest.fn();
+        const persister = vi.fn();
 
         storage.registerPersister('User', persister);
 
@@ -116,7 +117,7 @@ describe('RealmStorage', () => {
     it('clears the registered manifesters', () => {
       const storage = new RealmStorage();
 
-      storage.registerManifester('User', jest.fn());
+      storage.registerManifester('User', vi.fn());
 
       expect(() => storage.findManifester('User')).not.toThrow();
 
@@ -128,7 +129,7 @@ describe('RealmStorage', () => {
     it('clears the registered persisters', () => {
       const storage = new RealmStorage();
 
-      storage.registerPersister('User', jest.fn());
+      storage.registerPersister('User', vi.fn());
 
       expect(() => storage.findPersister('User')).not.toThrow();
 

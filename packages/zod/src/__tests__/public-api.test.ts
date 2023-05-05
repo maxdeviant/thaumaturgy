@@ -1,4 +1,5 @@
 import { Sequence } from '@thaumaturgy/core';
+import { describe, expect, it } from 'vitest';
 import { z } from 'zod';
 // Importing from the root barrel file intentionally to simulate what library
 // consumers will see.
