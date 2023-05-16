@@ -1,69 +1,31 @@
-import SqliteDatabase from 'better-sqlite3';
-import { Kysely, SqliteDialect, sql } from 'kysely';
 import assert from 'node:assert';
 import { describe, expect, it } from 'vitest';
 import { Realm } from '../realm';
-import { Database } from './database';
-import { Comment, Context } from './fixtures';
+import { setupDatabase } from './database';
+import { Comment, Context, define } from './fixtures';
 
 describe('Realm', () => {
+  const performSetup = async () => {
+    const { db } = await setupDatabase();
+
+    const realm = new Realm<Context>();
+
+    define(realm);
+
+    return { db, realm };
+  };
+
   describe('persistLeaves', () => {
-    const setupDatabase = async () => {
-      const db = new Kysely<Database>({
-        dialect: new SqliteDialect({
-          database: async () => new SqliteDatabase(':memory:'),
-        }),
-      });
-
-      return { db };
-    };
-
     describe('for an entity hierarchy with randomly-generated IDs', () => {
-      const performSetup = async () => {
-        const { db } = await setupDatabase();
-
-        await sql`pragma foreign_keys = on`.execute(db);
-
-        await db.schema
-          .createTable('author')
-          .addColumn('id', 'text', col => col.primaryKey())
-          .addColumn('name', 'text', col => col.notNull())
-          .execute();
-
-        await db.schema
-          .createTable('post')
-          .addColumn('id', 'text', col => col.primaryKey())
-          .addColumn('author_id', 'text', col => col.notNull())
-          .addColumn('title', 'text', col => col.notNull())
-          .addForeignKeyConstraint('post_author_id', ['author_id'], 'author', [
-            'id',
-          ])
-          .execute();
-
-        await db.schema
-          .createTable('comment')
-          .addColumn('id', 'text', col => col.primaryKey())
-          .addColumn('post_id', 'text', col => col.notNull())
-          .addColumn('username', 'text', col => col.notNull())
-          .addForeignKeyConstraint('comment_post_id', ['post_id'], 'post', [
-            'id',
-          ])
-          .execute();
-
-        const realm = new Realm<Context>();
-
-        return { db, realm };
-      };
-
       it('persists an instance of each entity in the hierarchy', async () => {
         const { db, realm } = await performSetup();
 
         await db.transaction().execute(async tx => {
           const leaves = await realm.persistLeaves({ tx });
 
-          expect(leaves).toHaveLength(1);
+          expect(leaves).toHaveLength(2);
 
-          const comment = leaves[0];
+          const comment = leaves[1];
           expect(Comment.is(comment)).toBe(true);
           assert.ok(Comment.is(comment));
 
@@ -73,7 +35,7 @@ describe('Realm', () => {
             username: 'user1',
           });
 
-          const authorsInDatabase = await db
+          const authorsInDatabase = await tx
             .selectFrom('author')
             .selectAll()
             .execute();
@@ -85,7 +47,7 @@ describe('Realm', () => {
             },
           ]);
 
-          const postsInDatabase = await db
+          const postsInDatabase = await tx
             .selectFrom('post')
             .selectAll()
             .execute();
@@ -98,7 +60,7 @@ describe('Realm', () => {
             },
           ]);
 
-          const commentsInDatabase = await db
+          const commentsInDatabase = await tx
             .selectFrom('comment')
             .selectAll()
             .execute();

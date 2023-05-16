@@ -5,6 +5,11 @@ import { Transaction } from 'kysely';
 import { Database } from './database';
 import { Sequence } from '@thaumaturgy/core';
 
+export const Car = t.type({
+  make: t.string,
+  model: t.string,
+});
+
 export const Kingdom = t.type({ name: t.string }, 'Kingdom');
 
 export const Phylum = t.type({ kingdom: t.string, name: t.string }, 'Phylum');
@@ -36,6 +41,21 @@ export interface Context {
 }
 
 export const define = (realm: Realm<Context>) => {
+  realm.define(Car, {
+    manifest: () => ({
+      make: 'Honda',
+      model: 'Civic',
+    }),
+    persist: async (car, { tx }) => {
+      await tx
+        .insertInto('car')
+        .values({ make: car.make, model: car.model })
+        .execute();
+
+      return car;
+    },
+  });
+
   realm.define(Kingdom, {
     manifest: () => ({ name: 'Animalia' }),
     persist: async (kingdom, { tx }) => {
