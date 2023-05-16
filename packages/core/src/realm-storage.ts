@@ -18,7 +18,7 @@ import { Entity, EntityName, Manifester, Persister } from './types';
 export class RealmStorage {
   private readonly entities = new Map<EntityName, Entity>();
   private readonly manifesters = new Map<EntityName, Manifester<any, any>>();
-  private readonly persisters = new Map<EntityName, Persister<any>>();
+  private readonly persisters = new Map<EntityName, Persister<any, any>>();
   private readonly sequences = new Map<
     EntityName,
     Record<string, Sequence<any>>
@@ -83,7 +83,7 @@ export class RealmStorage {
    * @param entityName The name of the entity to register the persister under.
    * @param persister The persister to register.
    */
-  registerPersister(entityName: EntityName, persister: Persister<any>) {
+  registerPersister(entityName: EntityName, persister: Persister<any, any>) {
     if (this.persisters.has(entityName)) {
       throw new PersisterAlreadyRegisteredError(entityName);
     }
