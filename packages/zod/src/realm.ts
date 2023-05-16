@@ -1,19 +1,27 @@
-import { Realm as BackingRealm, PersistLeaves } from '@thaumaturgy/core';
+import {
+  Realm as BackingRealm,
+  DefineOptions,
+  Sequences,
+} from '@thaumaturgy/core';
+import { z } from 'zod';
 import { extractEntityName } from './entity-name';
-import { Define, Manifest, Persist } from './types';
+import { EntityC, Manifest } from './types';
 
 /**
  * A realm is an isolated environment that entities may be registered with.
  *
  * Entity names must be unique within a realm.
  */
-export class Realm {
-  private readonly realm = new BackingRealm();
+export class Realm<TContext> {
+  private readonly realm = new BackingRealm<TContext>();
 
   /**
    * Defines an entity in the realm using the specified manifester and persister.
    */
-  readonly define: Define = (Entity, options) => {
+  readonly define = <C extends EntityC, TSequences extends Sequences>(
+    Entity: C,
+    options: DefineOptions<z.TypeOf<C>, TSequences, TContext>
+  ): void => {
     this.realm.define({ C: Entity, name: extractEntityName(Entity) }, options);
   };
 
@@ -41,9 +49,14 @@ export class Realm {
    * Persists an instance of the specified entity.
    *
    * @param Entity The entity to persist.
+   * @param context The context to pass to the persister.
    * @param overrides The overrides to pass to the persister.
    */
-  readonly persist: Persist = async (Entity, overrides = {}, context) => {
+  readonly persist = async <C extends EntityC>(
+    Entity: C,
+    context: TContext,
+    overrides: Partial<z.TypeOf<C>> = {}
+  ): Promise<z.TypeOf<C>> => {
     return this.realm.persist(
       { C: Entity, name: extractEntityName(Entity) },
       overrides,
@@ -51,7 +64,7 @@ export class Realm {
     );
   };
 
-  readonly persistLeaves: PersistLeaves = async () => {
-    return this.realm.persistLeaves();
+  readonly persistLeaves = async (context: TContext) => {
+    return this.realm.persistLeaves(context);
   };
 }
