@@ -47,6 +47,8 @@ describe('Realm', () => {
 
     describe('when `persist` is invoked', () => {
       it('calls the persister', async () => {
+        const context = {};
+
         const realm = new Realm();
 
         const persister = vi.fn(movie => Promise.resolve(movie));
@@ -56,12 +58,14 @@ describe('Realm', () => {
           persist: persister,
         });
 
-        await realm.persist(Movie);
+        await realm.persist(Movie, context);
 
         expect(persister).toHaveBeenCalledTimes(1);
       });
 
       it('passes the manifested entity to the persister', async () => {
+        const context = {};
+
         const realm = new Realm();
 
         const persister = vi.fn(movie => Promise.resolve(movie));
@@ -71,7 +75,7 @@ describe('Realm', () => {
           persist: persister,
         });
 
-        await realm.persist(Movie);
+        await realm.persist(Movie, context);
 
         expect(persister).toHaveBeenCalledWith(
           {
@@ -84,6 +88,8 @@ describe('Realm', () => {
 
       describe('with a `context` parameter', () => {
         it('passes the context to the persister', async () => {
+          const context = { a: 'hello', b: 'world' };
+
           const realm = new Realm();
 
           const persister = vi.fn(movie => Promise.resolve(movie));
@@ -93,15 +99,12 @@ describe('Realm', () => {
             persist: persister,
           });
 
-          await realm.persist(Movie, {}, { a: 'hello', b: 'world' });
+          await realm.persist(Movie, context, {});
 
-          expect(persister).toHaveBeenCalledWith(
-            {
-              title: 'Arrival',
-              year: 2017 as t.Int,
-            },
-            { a: 'hello', b: 'world' }
-          );
+          expect(persister).toHaveBeenCalledWith(context, {
+            title: 'Arrival',
+            year: 2017 as t.Int,
+          });
         });
       });
     });

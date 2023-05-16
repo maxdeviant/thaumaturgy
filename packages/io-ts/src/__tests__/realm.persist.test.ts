@@ -78,7 +78,9 @@ describe('Realm', () => {
         .addColumn('model', 'text', col => col.notNull())
         .execute();
 
-      const realm = new Realm();
+      const context = { db };
+
+      const realm = new Realm<typeof context>();
 
       realm.define(Car, {
         manifest: () => ({
@@ -95,14 +97,14 @@ describe('Realm', () => {
         },
       });
 
-      return { db, realm };
+      return { db, realm, context };
     };
 
     describe('with no overrides', () => {
       it('persists an instance of the provided type', async () => {
-        const { db, realm } = await performSetup();
+        const { db, realm, context } = await performSetup();
 
-        const persisted = await realm.persist(Car);
+        const persisted = await realm.persist(Car, context);
 
         expect(persisted).toEqual({
           make: 'Honda',
@@ -120,9 +122,9 @@ describe('Realm', () => {
 
     describe('with overrides', () => {
       it('persists an instance of the provided type with the overrides applied', async () => {
-        const { db, realm } = await performSetup();
+        const { db, realm, context } = await performSetup();
 
-        const persisted = await realm.persist(Car, {
+        const persisted = await realm.persist(Car, context, {
           model: 'CRV',
         });
 
@@ -175,12 +177,14 @@ describe('Realm', () => {
           ])
           .execute();
 
-        const realm = new Realm();
+        const context = { db };
+
+        const realm = new Realm<typeof context>();
 
         realm.define(Kingdom, {
           manifest: () => ({ name: 'Animalia' }),
-          persist: async kingdom => {
-            await db
+          persist: async (kingdom, context) => {
+            await context.db
               .insertInto('kingdom')
               .values({ name: kingdom.name })
               .execute();
@@ -194,8 +198,8 @@ describe('Realm', () => {
             kingdom: Ref.to(Kingdom).through(kingdom => kingdom.name),
             name: 'Chordata',
           }),
-          persist: async phylum => {
-            await db
+          persist: async (phylum, context) => {
+            await context.db
               .insertInto('phylum')
               .values({ kingdom: phylum.kingdom, name: phylum.name })
               .execute();
@@ -209,8 +213,8 @@ describe('Realm', () => {
             phylum: Ref.to(Phylum).through(phylum => phylum.name),
             name: 'Mammalia',
           }),
-          persist: async class_ => {
-            await db
+          persist: async (class_, context) => {
+            await context.db
               .insertInto('class')
               .values({ phylum: class_.phylum, name: class_.name })
               .execute();
@@ -219,13 +223,13 @@ describe('Realm', () => {
           },
         });
 
-        return { db, realm };
+        return { db, realm, context };
       };
 
       it('persists an instance of each entity in the hierarchy', async () => {
-        const { db, realm } = await performSetup();
+        const { db, realm, context } = await performSetup();
 
-        const persisted = await realm.persist(Class);
+        const persisted = await realm.persist(Class, context);
 
         expect(persisted).toEqual({
           phylum: 'Chordata',
@@ -320,7 +324,7 @@ describe('Realm', () => {
             id: uuid(),
             name: sequences.names.next(),
           }),
-          persist: async author => {
+          persist: async (author, context) => {
             await db
               .insertInto('author')
               .values({ id: author.id, name: author.name })

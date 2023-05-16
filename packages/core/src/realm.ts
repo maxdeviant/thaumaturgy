@@ -3,14 +3,14 @@ import { topologicallyBatchEntities } from './entity-graph-utils';
 import { isUnknownRecord } from './is-unknown-record';
 import { RealmStorage } from './realm-storage';
 import { isMappedRef, ManifestedRef, MappedRef } from './ref';
-import { Define, Entity, Manifest, Persist, PersistLeaves } from './types';
+import { Define, Entity, Manifest } from './types';
 
 /**
  * A realm is an isolated environment that entities may be registered with.
  *
  * Entity names must be unique within a realm.
  */
-export class Realm {
+export class Realm<TContext> {
   private readonly storage = new RealmStorage();
 
   /**
@@ -56,20 +56,25 @@ export class Realm {
    *
    * @param Entity The entity to persist.
    * @param overrides The overrides to pass to the persister.
+   * @param context The context to pass to the persister.
    */
-  readonly persist: Persist = async (Entity, overrides = {}, context) => {
+  readonly persist = async <T>(
+    Entity: Entity,
+    overrides: Partial<T> = {},
+    context: TContext
+  ): Promise<T> => {
     const persister = this.storage.findPersister(Entity.name);
 
     const { manifestedEntity, refs } = this.manifestWithRefs(Entity, overrides);
 
     for (const ref of refs.reverse()) {
-      await this.persistRef(ref);
+      await this.persistRef(context, ref);
     }
 
     return persister(manifestedEntity, context);
   };
 
-  readonly persistLeaves: PersistLeaves = async () => {
+  readonly persistLeaves = async (context: TContext): Promise<unknown[]> => {
     const topologicallyBatchedEntities = this.storage.withSnapshottedSequences(
       () =>
         topologicallyBatchEntities(
@@ -86,7 +91,7 @@ export class Realm {
     const persistedEntities: any[] = [];
 
     for (const Entity of lastBatch) {
-      persistedEntities.push(await this.persist(Entity));
+      persistedEntities.push(await this.persist(Entity, undefined, context));
     }
 
     return persistedEntities;
@@ -162,9 +167,12 @@ export class Realm {
     ];
   }
 
-  private persistRef<C extends Entity>(ref: ManifestedRef<C, unknown>) {
+  private persistRef<C extends Entity>(
+    context: TContext,
+    ref: ManifestedRef<C, unknown>
+  ) {
     const persister = this.storage.findPersister(ref.Entity.name);
 
-    return persister(ref.entity);
+    return persister(ref.entity, context);
   }
 }

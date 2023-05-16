@@ -83,7 +83,7 @@ export class RealmStorage {
    * @param entityName The name of the entity to register the persister under.
    * @param persister The persister to register.
    */
-  registerPersister(entityName: EntityName, persister: Persister<any>) {
+  registerPersister(entityName: EntityName, persister: Persister<any, any>) {
     if (this.persisters.has(entityName)) {
       throw new PersisterAlreadyRegisteredError(entityName);
     }

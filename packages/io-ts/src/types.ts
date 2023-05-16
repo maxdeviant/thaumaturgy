@@ -5,9 +5,13 @@ export type EntityName = string;
 
 export type EntityC = t.Any;
 
-export type Define = <C extends EntityC, TSequences extends Sequences>(
+export type Define = <
+  C extends EntityC,
+  TSequences extends Sequences,
+  TContext
+>(
   Entity: C,
-  options: DefineOptions<t.TypeOf<C>, TSequences>
+  options: DefineOptions<t.TypeOf<C>, TSequences, TContext>
 ) => void;
 
 export type Manifest = <C extends EntityC>(
