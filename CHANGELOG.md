@@ -7,6 +7,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Changed
+
+- **@thaumaturgy/core**: `persist` now takes a `context` parameter
+- **@thaumaturgy/io-ts**: `persist` now takes a `context` parameter
+- **@thaumaturgy/zod**: `persist` now takes a `context` parameter
+
 ## [0.13.0] - 2023-05-04
 
 ### Changed
