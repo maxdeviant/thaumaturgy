@@ -1,12 +1,10 @@
-import { Sequence } from '@thaumaturgy/core';
 import SqliteDatabase from 'better-sqlite3';
 import * as t from 'io-ts';
 import { Kysely, SqliteDialect, sql } from 'kysely';
 import { describe, expect, it } from 'vitest';
 import { Realm } from '../realm';
-import { Ref } from '../ref';
 import { Database } from './database';
-import { define } from './fixtures';
+import { Class, Comment, Context, define } from './fixtures';
 
 describe('Realm', () => {
   describe('persist', () => {
@@ -99,12 +97,6 @@ describe('Realm', () => {
     });
 
     describe('for an entity hierarchy', () => {
-      const Kingdom = t.type({ name: t.string });
-
-      const Phylum = t.type({ kingdom: t.string, name: t.string });
-
-      const Class = t.type({ phylum: t.string, name: t.string });
-
       const performSetup = async () => {
         const { db } = await setupDatabase();
 
@@ -133,72 +125,52 @@ describe('Realm', () => {
           ])
           .execute();
 
-        const context = { db };
-
-        const realm = new Realm<typeof context>();
+        const realm = new Realm<Context>();
 
         define(realm);
 
-        return { db, realm, context };
+        return { db, realm };
       };
 
       it('persists an instance of each entity in the hierarchy', async () => {
-        const { db, realm, context } = await performSetup();
+        const { db, realm } = await performSetup();
 
-        const persisted = await realm.persist(Class, context);
+        await db.transaction().execute(async tx => {
+          const persisted = await realm.persist(Class, { tx });
 
-        expect(persisted).toEqual({
-          phylum: 'Chordata',
-          name: 'Mammalia',
+          expect(persisted).toEqual({
+            phylum: 'Chordata',
+            name: 'Mammalia',
+          });
+
+          const classFromDatabase = await tx
+            .selectFrom('class')
+            .select(['phylum', 'name'])
+            .executeTakeFirst();
+
+          expect(classFromDatabase).toEqual(persisted);
+
+          const phylumFromDatabase = await tx
+            .selectFrom('phylum')
+            .select(['kingdom', 'name'])
+            .executeTakeFirst();
+
+          expect(phylumFromDatabase).toEqual({
+            kingdom: 'Animalia',
+            name: 'Chordata',
+          });
+
+          const kingdomFromDatabase = await tx
+            .selectFrom('kingdom')
+            .select('name')
+            .executeTakeFirst();
+
+          expect(kingdomFromDatabase).toEqual({ name: 'Animalia' });
         });
-
-        const classFromDatabase = await db
-          .selectFrom('class')
-          .select(['phylum', 'name'])
-          .executeTakeFirst();
-
-        expect(classFromDatabase).toEqual(persisted);
-
-        const phylumFromDatabase = await db
-          .selectFrom('phylum')
-          .select(['kingdom', 'name'])
-          .executeTakeFirst();
-
-        expect(phylumFromDatabase).toEqual({
-          kingdom: 'Animalia',
-          name: 'Chordata',
-        });
-
-        const kingdomFromDatabase = await db
-          .selectFrom('kingdom')
-          .select('name')
-          .executeTakeFirst();
-
-        expect(kingdomFromDatabase).toEqual({ name: 'Animalia' });
       });
     });
 
     describe('for an entity hierarchy with randomly-generated IDs', () => {
-      const Author = t.type({ id: t.string, name: t.string }, 'Author');
-
-      const Post = t.type(
-        {
-          id: t.string,
-          authorId: t.string,
-          title: t.string,
-        },
-        'Post'
-      );
-
-      const Comment = t.type(
-        {
-          id: t.string,
-          postId: t.string,
-          username: t.string,
-        },
-        'Comment'
-      );
-
       const performSetup = async () => {
         const { db } = await setupDatabase();
 
@@ -230,116 +202,54 @@ describe('Realm', () => {
           ])
           .execute();
 
-        const context = { db };
+        const realm = new Realm<Context>();
 
-        const realm = new Realm<typeof context>();
+        define(realm);
 
-        realm.define(Author, {
-          sequences: {
-            names: new Sequence(n => `Author ${n}` as const),
-          },
-          manifest: ({ uuid, sequences }) => ({
-            id: uuid(),
-            name: sequences.names.next(),
-          }),
-          persist: async (author, context) => {
-            await context.db
-              .insertInto('author')
-              .values({ id: author.id, name: author.name })
-              .execute();
-
-            return author;
-          },
-        });
-
-        realm.define(Post, {
-          sequences: {
-            titles: new Sequence(n => `Post ${n}` as const),
-          },
-          manifest: ({ uuid, sequences }) => ({
-            id: uuid(),
-            authorId: Ref.to(Author).through(author => author.id),
-            title: sequences.titles.next(),
-          }),
-          persist: async (post, context) => {
-            await context.db
-              .insertInto('post')
-              .values({
-                id: post.id,
-                author_id: post.authorId,
-                title: post.title,
-              })
-              .execute();
-
-            return post;
-          },
-        });
-
-        realm.define(Comment, {
-          sequences: {
-            usernames: new Sequence(n => `user${n}` as const),
-          },
-          manifest: ({ uuid, sequences }) => ({
-            id: uuid(),
-            postId: Ref.to(Post).through(post => post.id),
-            username: sequences.usernames.next(),
-          }),
-          persist: async (comment, context) => {
-            await context.db
-              .insertInto('comment')
-              .values({
-                id: comment.id,
-                post_id: comment.postId,
-                username: comment.username,
-              })
-              .execute();
-
-            return comment;
-          },
-        });
-
-        return { db, realm, context };
+        return { db, realm };
       };
 
       it('persists an instance of each entity in the hierarchy', async () => {
-        const { db, realm, context } = await performSetup();
+        const { db, realm } = await performSetup();
 
-        const comment = await realm.persist(Comment, context);
+        await db.transaction().execute(async tx => {
+          const comment = await realm.persist(Comment, { tx });
 
-        const commentsInDatabase = await db
-          .selectFrom('comment')
-          .selectAll()
-          .execute();
+          const commentsInDatabase = await tx
+            .selectFrom('comment')
+            .selectAll()
+            .execute();
 
-        expect(commentsInDatabase).toEqual([
-          {
-            id: comment.id,
-            post_id: comment.postId,
-            username: comment.username,
-          },
-        ]);
+          expect(commentsInDatabase).toEqual([
+            {
+              id: comment.id,
+              post_id: comment.postId,
+              username: comment.username,
+            },
+          ]);
 
-        const postsInDatabase = await db
-          .selectFrom('post')
-          .selectAll()
-          .execute();
+          const postsInDatabase = await tx
+            .selectFrom('post')
+            .selectAll()
+            .execute();
 
-        expect(postsInDatabase).toEqual([
-          {
-            id: comment.postId,
-            author_id: expect.any(String),
-            title: expect.any(String),
-          },
-        ]);
+          expect(postsInDatabase).toEqual([
+            {
+              id: comment.postId,
+              author_id: expect.any(String),
+              title: expect.any(String),
+            },
+          ]);
 
-        const authorsInDatabase = await db
-          .selectFrom('author')
-          .selectAll()
-          .execute();
+          const authorsInDatabase = await tx
+            .selectFrom('author')
+            .selectAll()
+            .execute();
 
-        expect(authorsInDatabase).toEqual([
-          { id: postsInDatabase[0]?.author_id, name: expect.any(String) },
-        ]);
+          expect(authorsInDatabase).toEqual([
+            { id: postsInDatabase[0]?.author_id, name: expect.any(String) },
+          ]);
+        });
       });
     });
   });

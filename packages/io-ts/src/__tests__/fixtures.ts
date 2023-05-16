@@ -3,12 +3,33 @@ import { Realm } from '../realm';
 import { Ref } from '../ref';
 import { Transaction } from 'kysely';
 import { Database } from './database';
+import { Sequence } from '@thaumaturgy/core';
 
-const Kingdom = t.type({ name: t.string });
+export const Kingdom = t.type({ name: t.string }, 'Kingdom');
 
-const Phylum = t.type({ kingdom: t.string, name: t.string });
+export const Phylum = t.type({ kingdom: t.string, name: t.string }, 'Phylum');
 
-const Class = t.type({ phylum: t.string, name: t.string });
+export const Class = t.type({ phylum: t.string, name: t.string }, 'Class');
+
+export const Author = t.type({ id: t.string, name: t.string }, 'Author');
+
+export const Post = t.type(
+  {
+    id: t.string,
+    authorId: t.string,
+    title: t.string,
+  },
+  'Post'
+);
+
+export const Comment = t.type(
+  {
+    id: t.string,
+    postId: t.string,
+    username: t.string,
+  },
+  'Comment'
+);
 
 export interface Context {
   tx: Transaction<Database>;
@@ -51,6 +72,70 @@ export const define = (realm: Realm<Context>) => {
         .execute();
 
       return class_;
+    },
+  });
+
+  realm.define(Author, {
+    sequences: {
+      names: new Sequence(n => `Author ${n}` as const),
+    },
+    manifest: ({ uuid, sequences }) => ({
+      id: uuid(),
+      name: sequences.names.next(),
+    }),
+    persist: async (author, context) => {
+      await context.tx
+        .insertInto('author')
+        .values({ id: author.id, name: author.name })
+        .execute();
+
+      return author;
+    },
+  });
+
+  realm.define(Post, {
+    sequences: {
+      titles: new Sequence(n => `Post ${n}` as const),
+    },
+    manifest: ({ uuid, sequences }) => ({
+      id: uuid(),
+      authorId: Ref.to(Author).through(author => author.id),
+      title: sequences.titles.next(),
+    }),
+    persist: async (post, context) => {
+      await context.tx
+        .insertInto('post')
+        .values({
+          id: post.id,
+          author_id: post.authorId,
+          title: post.title,
+        })
+        .execute();
+
+      return post;
+    },
+  });
+
+  realm.define(Comment, {
+    sequences: {
+      usernames: new Sequence(n => `user${n}` as const),
+    },
+    manifest: ({ uuid, sequences }) => ({
+      id: uuid(),
+      postId: Ref.to(Post).through(post => post.id),
+      username: sequences.usernames.next(),
+    }),
+    persist: async (comment, context) => {
+      await context.tx
+        .insertInto('comment')
+        .values({
+          id: comment.id,
+          post_id: comment.postId,
+          username: comment.username,
+        })
+        .execute();
+
+      return comment;
     },
   });
 };
