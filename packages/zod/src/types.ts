@@ -15,7 +15,8 @@ export type Manifest = <C extends EntityC>(
   overrides?: Partial<z.TypeOf<C>>
 ) => z.TypeOf<C>;
 
-export type Persist = <C extends EntityC>(
+export type Persist = <C extends EntityC, TContext = unknown>(
   Entity: C,
-  overrides?: Partial<z.TypeOf<C>>
+  overrides?: Partial<z.TypeOf<C>>,
+  context?: TContext
 ) => Promise<z.TypeOf<C>>;

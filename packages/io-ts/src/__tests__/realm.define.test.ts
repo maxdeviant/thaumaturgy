@@ -73,9 +73,35 @@ describe('Realm', () => {
 
         await realm.persist(Movie);
 
-        expect(persister).toHaveBeenCalledWith({
-          title: 'Arrival',
-          year: 2017 as t.Int,
+        expect(persister).toHaveBeenCalledWith(
+          {
+            title: 'Arrival',
+            year: 2017 as t.Int,
+          },
+          undefined
+        );
+      });
+
+      describe('with a `context` parameter', () => {
+        it('passes the context to the persister', async () => {
+          const realm = new Realm();
+
+          const persister = vi.fn(movie => Promise.resolve(movie));
+
+          realm.define(Movie, {
+            manifest: () => ({ title: 'Arrival', year: 2017 as t.Int }),
+            persist: persister,
+          });
+
+          await realm.persist(Movie, {}, { a: 'hello', b: 'world' });
+
+          expect(persister).toHaveBeenCalledWith(
+            {
+              title: 'Arrival',
+              year: 2017 as t.Int,
+            },
+            { a: 'hello', b: 'world' }
+          );
         });
       });
     });

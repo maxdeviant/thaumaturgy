@@ -57,7 +57,7 @@ export class Realm {
    * @param Entity The entity to persist.
    * @param overrides The overrides to pass to the persister.
    */
-  readonly persist: Persist = async (Entity, overrides = {}) => {
+  readonly persist: Persist = async (Entity, overrides = {}, context) => {
     const persister = this.storage.findPersister(Entity.name);
 
     const { manifestedEntity, refs } = this.manifestWithRefs(Entity, overrides);
@@ -66,7 +66,7 @@ export class Realm {
       await this.persistRef(ref);
     }
 
-    return persister(manifestedEntity);
+    return persister(manifestedEntity, context);
   };
 
   readonly persistLeaves: PersistLeaves = async () => {

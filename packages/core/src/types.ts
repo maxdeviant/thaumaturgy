@@ -25,7 +25,10 @@ export type Manifester<T, TSequences> = (
 /**
  * A persister for an entity of type `T`.
  */
-export type Persister<T> = (entity: T) => Promise<T>;
+export type Persister<T, TContext = unknown> = (
+  entity: T,
+  context?: TContext
+) => Promise<T>;
 
 export interface Sequences {
   [name: string]: Sequence<unknown>;
@@ -44,6 +47,10 @@ export type Define = <T, TSequences extends Sequences>(
 
 export type Manifest = <T>(Entity: Entity, overrides?: Partial<T>) => T;
 
-export type Persist = <T>(Entity: Entity, overrides?: Partial<T>) => Promise<T>;
+export type Persist = <T, TContext = unknown>(
+  Entity: Entity,
+  overrides?: Partial<T>,
+  context?: TContext
+) => Promise<T>;
 
 export type PersistLeaves = () => Promise<unknown[]>;

@@ -18,7 +18,7 @@ import { Entity, EntityName, Manifester, Persister } from './types';
 export class RealmStorage {
   private readonly entities = new Map<EntityName, Entity>();
   private readonly manifesters = new Map<EntityName, Manifester<any, any>>();
-  private readonly persisters = new Map<EntityName, Persister<any>>();
+  private readonly persisters = new Map<EntityName, Persister<any, any>>();
   private readonly sequences = new Map<
     EntityName,
     Record<string, Sequence<any>>

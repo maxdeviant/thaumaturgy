@@ -39,8 +39,12 @@ export class Realm {
    * @param Entity The entity to persist.
    * @param overrides The overrides to pass to the persister.
    */
-  readonly persist: Persist = async (Entity, overrides = {}) => {
-    return this.realm.persist({ C: Entity, name: Entity.name }, overrides);
+  readonly persist: Persist = async (Entity, overrides = {}, context) => {
+    return this.realm.persist(
+      { C: Entity, name: Entity.name },
+      overrides,
+      context
+    );
   };
 
   readonly persistLeaves: PersistLeaves = async () => {
