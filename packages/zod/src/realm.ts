@@ -5,7 +5,7 @@ import {
 } from '@thaumaturgy/core';
 import { z } from 'zod';
 import { extractEntityName } from './entity-name';
-import { EntityC, Manifest } from './types';
+import { EntityC } from './types';
 
 /**
  * A realm is an isolated environment that entities may be registered with.
@@ -38,7 +38,10 @@ export class Realm<TContext> {
    * @param Entity The entity to manifest.
    * @param overrides The overrides to pass to the manifester.
    */
-  readonly manifest: Manifest = (Entity, overrides = {}) => {
+  readonly manifest = <C extends EntityC>(
+    Entity: C,
+    overrides: Partial<z.TypeOf<C>> = {}
+  ): z.TypeOf<C> => {
     return this.realm.manifest(
       { C: Entity, name: extractEntityName(Entity) },
       overrides

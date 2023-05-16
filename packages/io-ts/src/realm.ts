@@ -4,7 +4,7 @@ import {
   Sequences,
 } from '@thaumaturgy/core';
 import * as t from 'io-ts';
-import { EntityC, Manifest } from './types';
+import { EntityC } from './types';
 
 /**
  * A realm is an isolated environment that entities may be registered with.
@@ -37,7 +37,10 @@ export class Realm<TContext> {
    * @param Entity The entity to manifest.
    * @param overrides The overrides to pass to the manifester.
    */
-  readonly manifest: Manifest = (Entity, overrides = {}) => {
+  readonly manifest = <C extends EntityC>(
+    Entity: C,
+    overrides: Partial<t.TypeOf<C>> = {}
+  ): t.TypeOf<C> => {
     return this.realm.manifest({ C: Entity, name: Entity.name }, overrides);
   };
 
