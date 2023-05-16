@@ -1,6 +1,6 @@
 {
   "name": "@thaumaturgy/zod",
-  "version": "0.13.0",
+  "version": "0.14.0",
   "repository": "git@github.com:maxdeviant/thaumaturgy.git",
   "author": "Marshall Bowers <elliott.codes@gmail.com>",
   "license": "MIT",
