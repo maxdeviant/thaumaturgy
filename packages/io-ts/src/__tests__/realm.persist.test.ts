@@ -5,52 +5,8 @@ import { Kysely, SqliteDialect, sql } from 'kysely';
 import { describe, expect, it } from 'vitest';
 import { Realm } from '../realm';
 import { Ref } from '../ref';
-
-interface Car {
-  make: string;
-  model: string;
-}
-
-interface Kingdom {
-  name: string;
-}
-
-interface Phylum {
-  kingdom: string;
-  name: string;
-}
-
-interface Class {
-  phylum: string;
-  name: string;
-}
-
-interface Author {
-  id: string;
-  name: string;
-}
-
-interface Post {
-  id: string;
-  author_id: string;
-  title: string;
-}
-
-interface Comment {
-  id: string;
-  post_id: string;
-  username: string;
-}
-
-interface Database {
-  car: Car;
-  kingdom: Kingdom;
-  phylum: Phylum;
-  class: Class;
-  author: Author;
-  post: Post;
-  comment: Comment;
-}
+import { Database } from './database';
+import { define } from './fixtures';
 
 describe('Realm', () => {
   describe('persist', () => {
@@ -181,47 +137,7 @@ describe('Realm', () => {
 
         const realm = new Realm<typeof context>();
 
-        realm.define(Kingdom, {
-          manifest: () => ({ name: 'Animalia' }),
-          persist: async (kingdom, context) => {
-            await context.db
-              .insertInto('kingdom')
-              .values({ name: kingdom.name })
-              .execute();
-
-            return kingdom;
-          },
-        });
-
-        realm.define(Phylum, {
-          manifest: () => ({
-            kingdom: Ref.to(Kingdom).through(kingdom => kingdom.name),
-            name: 'Chordata',
-          }),
-          persist: async (phylum, context) => {
-            await context.db
-              .insertInto('phylum')
-              .values({ kingdom: phylum.kingdom, name: phylum.name })
-              .execute();
-
-            return phylum;
-          },
-        });
-
-        realm.define(Class, {
-          manifest: () => ({
-            phylum: Ref.to(Phylum).through(phylum => phylum.name),
-            name: 'Mammalia',
-          }),
-          persist: async (class_, context) => {
-            await context.db
-              .insertInto('class')
-              .values({ phylum: class_.phylum, name: class_.name })
-              .execute();
-
-            return class_;
-          },
-        });
+        define(realm);
 
         return { db, realm, context };
       };
@@ -314,7 +230,9 @@ describe('Realm', () => {
           ])
           .execute();
 
-        const realm = new Realm();
+        const context = { db };
+
+        const realm = new Realm<typeof context>();
 
         realm.define(Author, {
           sequences: {
@@ -325,7 +243,7 @@ describe('Realm', () => {
             name: sequences.names.next(),
           }),
           persist: async (author, context) => {
-            await db
+            await context.db
               .insertInto('author')
               .values({ id: author.id, name: author.name })
               .execute();
@@ -343,8 +261,8 @@ describe('Realm', () => {
             authorId: Ref.to(Author).through(author => author.id),
             title: sequences.titles.next(),
           }),
-          persist: async post => {
-            await db
+          persist: async (post, context) => {
+            await context.db
               .insertInto('post')
               .values({
                 id: post.id,
@@ -366,8 +284,8 @@ describe('Realm', () => {
             postId: Ref.to(Post).through(post => post.id),
             username: sequences.usernames.next(),
           }),
-          persist: async comment => {
-            await db
+          persist: async (comment, context) => {
+            await context.db
               .insertInto('comment')
               .values({
                 id: comment.id,
@@ -380,13 +298,13 @@ describe('Realm', () => {
           },
         });
 
-        return { db, realm };
+        return { db, realm, context };
       };
 
       it('persists an instance of each entity in the hierarchy', async () => {
-        const { db, realm } = await performSetup();
+        const { db, realm, context } = await performSetup();
 
-        const comment = await realm.persist(Comment);
+        const comment = await realm.persist(Comment, context);
 
         const commentsInDatabase = await db
           .selectFrom('comment')
