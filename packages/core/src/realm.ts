@@ -3,7 +3,13 @@ import { topologicallyBatchEntities } from './entity-graph-utils';
 import { isUnknownRecord } from './is-unknown-record';
 import { RealmStorage } from './realm-storage';
 import { isMappedRef, ManifestedRef, MappedRef } from './ref';
-import { Define, Entity, Manifest } from './types';
+import { Entity, Manifest, Manifester, Persister, Sequences } from './types';
+
+export interface DefineOptions<T, TSequences extends Sequences, TContext> {
+  sequences?: TSequences;
+  manifest: Manifester<T, TSequences>;
+  persist?: Persister<T, TContext>;
+}
 
 /**
  * A realm is an isolated environment that entities may be registered with.
@@ -16,10 +22,14 @@ export class Realm<TContext> {
   /**
    * Defines an entity in the realm using the specified manifester and persister.
    */
-  readonly define: Define = (
-    Entity,
-    { manifest: manifester, persist: persister, sequences }
-  ) => {
+  readonly define = <T, TSequences extends Sequences>(
+    Entity: Entity,
+    {
+      manifest: manifester,
+      persist: persister,
+      sequences,
+    }: DefineOptions<T, TSequences, TContext>
+  ): void => {
     this.storage.registerEntity(Entity);
     this.storage.registerManifester(Entity.name, manifester);
 

@@ -34,15 +34,4 @@ export interface Sequences {
   [name: string]: Sequence<unknown>;
 }
 
-export interface DefineOptions<T, TSequences extends Sequences, TContext> {
-  sequences?: TSequences;
-  manifest: Manifester<T, TSequences>;
-  persist?: Persister<T, TContext>;
-}
-
-export type Define = <T, TSequences extends Sequences, TContext>(
-  Entity: Entity,
-  options: DefineOptions<T, TSequences, TContext>
-) => void;
-
 export type Manifest = <T>(Entity: Entity, overrides?: Partial<T>) => T;
