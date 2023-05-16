@@ -65,13 +65,13 @@ export class Realm<TContext> {
    * Persists an instance of the specified entity.
    *
    * @param Entity The entity to persist.
-   * @param overrides The overrides to pass to the persister.
    * @param context The context to pass to the persister.
+   * @param overrides The overrides to pass to the persister.
    */
   readonly persist = async <T>(
     Entity: Entity,
-    overrides: Partial<T> = {},
-    context: TContext
+    context: TContext,
+    overrides: Partial<T> = {}
   ): Promise<T> => {
     const persister = this.storage.findPersister(Entity.name);
 
@@ -101,7 +101,7 @@ export class Realm<TContext> {
     const persistedEntities: any[] = [];
 
     for (const Entity of lastBatch) {
-      persistedEntities.push(await this.persist(Entity, undefined, context));
+      persistedEntities.push(await this.persist(Entity, context));
     }
 
     return persistedEntities;

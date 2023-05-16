@@ -58,8 +58,8 @@ export class Realm<TContext> {
   ): Promise<t.TypeOf<C>> => {
     return this.realm.persist(
       { C: Entity, name: Entity.name },
-      overrides,
-      context
+      context,
+      overrides
     );
   };
 

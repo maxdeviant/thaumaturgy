@@ -62,8 +62,8 @@ export class Realm<TContext> {
   ): Promise<z.TypeOf<C>> => {
     return this.realm.persist(
       { C: Entity, name: extractEntityName(Entity) },
-      overrides,
-      context
+      context,
+      overrides
     );
   };
 
