@@ -129,9 +129,13 @@ export class Realm<TContext> {
       return manifestedRef.mappedValue;
     };
 
-    const processValue = (value: unknown) => {
+    const processValue = (value: unknown): unknown => {
       if (isMappedRef(value)) {
         return processRef(value);
+      }
+
+      if (Array.isArray(value)) {
+        return value.map(processValue);
       }
 
       if (isUnknownRecord(value)) {

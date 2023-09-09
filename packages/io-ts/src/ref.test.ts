@@ -187,4 +187,42 @@ describe('Ref', () => {
       expect(authorManifester).toHaveBeenCalled();
     });
   });
+
+  describe('when used inside of an array', () => {
+    it(`calls the referenced entity's manifester`, () => {
+      const realm = new Realm();
+
+      const Author = t.strict({ id: t.string });
+
+      const Post = t.strict({
+        id: t.string,
+        authorIds: t.array(t.string),
+      });
+
+      const authorManifester = vi.fn<
+        [ManifesterOptions<unknown>],
+        t.TypeOf<typeof Author>
+      >(({ uuid }) => ({ id: uuid() }));
+
+      realm.define(Author, {
+        manifest: authorManifester,
+      });
+
+      realm.define(Post, {
+        manifest: ({ uuid }) => ({
+          id: uuid(),
+          authorIds: [
+            Ref.to(Author).through(author => author.id),
+            Ref.to(Author).through(author => author.id),
+          ],
+        }),
+      });
+
+      const post = realm.manifest(Post);
+
+      expect(post.authorIds).toEqual([expect.any(String), expect.any(String)]);
+
+      expect(authorManifester).toHaveBeenCalledTimes(2);
+    });
+  });
 });
