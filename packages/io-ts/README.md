@@ -20,7 +20,7 @@ npm install -D @thaumaturgy/io-ts
 
 ```ts
 import * as t from 'io-ts';
-import { define, manifest } from '@thaumaturgy/io-ts';
+import { Realm } from '@thaumaturgy/io-ts';
 
 const Movie = t.strict(
   {
@@ -30,7 +30,9 @@ const Movie = t.strict(
   'Movie'
 );
 
-define(Movie, {
+const realm = new Realm();
+
+realm.define(Movie, {
   sequences: {
     titles: new Sequence(n => `Movie ${n}` as const),
     years: new Sequence(n => 2022 - n),
@@ -41,7 +43,7 @@ define(Movie, {
   }),
 });
 
-const movie = manifest(Movie);
+const movie = realm.manifest(Movie);
 
 console.log(movie);
 // > { title: 'Movie 1', year: 2021 }
@@ -51,7 +53,7 @@ console.log(movie);
 
 ```ts
 import * as t from 'io-ts';
-import { define, manifest, Ref } from '@thaumaturgy/io-ts';
+import { Realm, Ref } from '@thaumaturgy/io-ts';
 
 const Author = t.type(
   {
@@ -70,14 +72,16 @@ const Book = t.type(
   'Book'
 );
 
-define(Author, {
+const realm = new Realm();
+
+realm.define(Author, {
   manifest: ({ uuid }) => ({
     id: uuid(),
     name: 'J. R. R. Tolkien',
   }),
 });
 
-define(Book, {
+realm.define(Book, {
   manifest: ({ uuid }) => ({
     id: uuid(),
     authorId: Ref.to(Author).through(author => author.id),
@@ -85,7 +89,7 @@ define(Book, {
   }),
 });
 
-const book = manifest(Book);
+const book = realm.manifest(Book);
 
 console.log(book);
 // > {

@@ -3,10 +3,12 @@ import { describe, expect, it } from 'vitest';
 import { z } from 'zod';
 // Importing from the root barrel file intentionally to simulate what library
 // consumers will see.
-import { define, manifest, Ref } from '..';
+import { Realm, Ref } from '..';
 
 describe('Public API', () => {
   it('works with a basic example', () => {
+    const realm = new Realm();
+
     const Movie = z
       .object({
         title: z.string(),
@@ -15,7 +17,7 @@ describe('Public API', () => {
       .strict()
       .describe('Movie');
 
-    define(Movie, {
+    realm.define(Movie, {
       sequences: {
         movies: new Sequence(n => `Movie ${n}` as const),
         years: new Sequence(n => 2022 - n),
@@ -26,7 +28,7 @@ describe('Public API', () => {
       }),
     });
 
-    const movie = manifest(Movie);
+    const movie = realm.manifest(Movie);
 
     expect(movie).toEqual({
       title: expect.any(String),
@@ -35,6 +37,8 @@ describe('Public API', () => {
   });
 
   it('works with an entity containing an array field', () => {
+    const realm = new Realm();
+
     const Post = z
       .object({
         title: z.string(),
@@ -43,7 +47,7 @@ describe('Public API', () => {
       .strict()
       .describe('Post');
 
-    define(Post, {
+    realm.define(Post, {
       manifest: ({ sequences }) => ({
         title: sequences.titles.next(),
         tags: sequences.tags.take(3),
@@ -54,7 +58,7 @@ describe('Public API', () => {
       },
     });
 
-    const post = manifest(Post);
+    const post = realm.manifest(Post);
 
     expect(post).toEqual({
       title: expect.any(String),
@@ -63,6 +67,8 @@ describe('Public API', () => {
   });
 
   it('works with an entity hierarchy', () => {
+    const realm = new Realm();
+
     const Author = z
       .object({
         id: z.string(),
@@ -78,14 +84,14 @@ describe('Public API', () => {
       })
       .describe('Book');
 
-    define(Author, {
+    realm.define(Author, {
       manifest: ({ uuid }) => ({
         id: uuid(),
         name: 'J. R. R. Tolkien',
       }),
     });
 
-    define(Book, {
+    realm.define(Book, {
       manifest: ({ uuid }) => ({
         id: uuid(),
         authorId: Ref.to(Author).through(author => author.id),
@@ -93,7 +99,7 @@ describe('Public API', () => {
       }),
     });
 
-    const book = manifest(Book);
+    const book = realm.manifest(Book);
 
     expect(book).toEqual({
       id: expect.any(String),
